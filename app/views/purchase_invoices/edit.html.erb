@@ -1,0 +1,93 @@
+<% content_for :title, "Fatura Eşleştirme" %>
+
+<div class="d-flex justify-content-between align-items-start mb-2">
+  <h1 class="h3 mb-1">Fatura: <%= @purchase_invoice.invoice_number %></h1>
+  <%= link_to purchase_invoices_path, class: "btn btn-outline-secondary btn-sm" do %><i class="bi bi-arrow-left"></i> Faturalara Dön<% end %>
+</div>
+<p class="text-muted">
+  Tedarikçi: <% if policy(@purchase_invoice.supplier).show? %><%= link_to @purchase_invoice.supplier.name, supplier_path(@purchase_invoice.supplier) %><% else %><%= @purchase_invoice.supplier.name %><% end %> ·
+  Tarih: <%= @purchase_invoice.invoice_date %> ·
+  Durum: <%= @purchase_invoice.approved? ? "Onaylandı" : "Beklemede" %>
+  · <%= link_to "PDF İndir", receipt_purchase_invoice_path(@purchase_invoice), target: "_blank", class: "link-secondary" %>
+</p>
+
+<% if @purchase_invoice.source_pdfs.attached? %>
+  <p class="text-muted mb-3">
+    <i class="bi bi-paperclip"></i> Yüklenen kaynak belgeler:
+    <% @purchase_invoice.source_pdfs.each do |pdf| %>
+      <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "link-secondary me-2" %>
+    <% end %>
+  </p>
+<% end %>
+
+<% if @purchase_invoice.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @purchase_invoice.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @purchase_invoice, url: purchase_invoice_path(@purchase_invoice), method: :patch do |f| %>
+  <% unless @purchase_invoice.approved? %>
+    <div class="row g-3 mb-4">
+      <div class="col-md-5">
+        <%= f.label :supplier_id, "Tedarikçi", class: "form-label" %>
+        <%= f.collection_select :supplier_id, @suppliers, :id, :name, {}, class: "form-select" %>
+      </div>
+      <div class="col-md-4">
+        <%= f.label :invoice_number, "Fatura No", class: "form-label" %>
+        <%= f.text_field :invoice_number, class: "form-control" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :invoice_date, "Fatura Tarihi", class: "form-label" %>
+        <%= f.date_field :invoice_date, class: "form-control" %>
+      </div>
+    </div>
+  <% end %>
+
+  <table class="table align-middle">
+    <thead>
+      <tr>
+        <th>Tedarikçi Kodu</th>
+        <th>Tedarikçi Ürün Adı</th>
+        <th class="text-end">Miktar</th>
+        <th class="text-end">Birim Fiyat</th>
+        <th>Eşleştirilen Ürün</th>
+      </tr>
+    </thead>
+    <tbody>
+      <%= f.fields_for :purchase_invoice_lines do |lf| %>
+        <tr class="<%= "table-warning" if lf.object.product_id.blank? %>">
+          <td><%= lf.object.external_code %></td>
+          <td><%= lf.object.external_name %></td>
+          <td class="text-end"><%= lf.object.quantity %></td>
+          <td class="text-end"><%= lf.object.unit_price %></td>
+          <td>
+            <%= lf.hidden_field :id %>
+            <% if @purchase_invoice.approved? %>
+              <%= lf.object.product&.name %>
+            <% else %>
+              <%= lf.collection_select :product_id, @products, :id, :name, { include_blank: "Seçiniz" }, class: "form-select form-select-sm" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+
+  <% unless @purchase_invoice.approved? %>
+    <%= f.submit "Kaydet", class: "btn btn-primary" %>
+  <% end %>
+<% end %>
+
+<% if policy(@purchase_invoice).approve? && !@purchase_invoice.approved? %>
+  <div class="mt-3">
+    <%= button_to "Onayla ve Stoğu Güncelle", approve_purchase_invoice_path(@purchase_invoice), method: :patch, class: "btn btn-purchase", disabled: !@purchase_invoice.approvable?, form: { data: { turbo_confirm: "Fatura onaylanacak ve stok artırılacak. Emin misiniz?" } } %>
+    <% unless @purchase_invoice.approvable? %>
+      <p class="text-danger mt-2 mb-0">Onaylamak için tüm satırları bir ürünle eşleştirmelisiniz.</p>
+    <% end %>
+  </div>
+<% end %>

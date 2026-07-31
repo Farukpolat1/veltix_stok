@@ -1,0 +1,73 @@
+<% content_for :title, "Anasayfa" %>
+
+<div class="hero-light">
+  <div class="row align-items-center g-4">
+    <div class="col-lg-6">
+      <span class="hero-light__badge mb-3 d-inline-flex"><i class="bi bi-lightning-charge-fill"></i> PVC &amp; İmalat Sektörüne Özel Yönetim Paneli</span>
+      <h1 class="display-6 mb-3">Stoğunuzu ve Satışlarınızı<br>Tek Yerden, Kusursuz Yönetin</h1>
+      <p class="hero-light__lead lead mb-4">
+        PVC ve imalat sektörüne özel; stok takibini, yapay zeka destekli PDF
+        fatura okumayı ve cari hesap yönetimini uçtan uca dijitalleştirin.
+      </p>
+      <div class="d-flex flex-wrap gap-2">
+        <%= link_to new_demo_request_path, class: "btn btn-primary btn-lg" do %><i class="bi bi-calendar-check"></i> Demo Talep Edin<% end %>
+        <%= link_to new_session_path, class: "btn btn-outline-secondary btn-lg" do %><i class="bi bi-box-arrow-in-right"></i> Giriş Yap<% end %>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="hero-illustration">
+        <div class="hero-illustration__card">
+          <span class="hero-illustration__icon"><i class="bi bi-boxes"></i></span>
+          <div class="hero-illustration__bar hero-illustration__bar--accent" style="width: 80%"></div>
+          <div class="hero-illustration__bar" style="width: 55%"></div>
+          <div class="hero-illustration__bar" style="width: 68%"></div>
+          <div class="hero-illustration__bar hero-illustration__bar--accent" style="width: 40%"></div>
+        </div>
+        <span class="hero-illustration__chip hero-illustration__chip--top"><i class="bi bi-file-earmark-pdf text-primary"></i> Fatura Okundu</span>
+        <span class="hero-illustration__chip hero-illustration__chip--bottom"><i class="bi bi-check-circle text-success"></i> Satış Onaylandı</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h2 class="h5 text-center mb-4">Neden <%= Veltix::PLATFORM_NAME %>?</h2>
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-3">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-boxes"></i>
+      <h3 class="h6 mb-1">Detaylı Stok Takibi</h3>
+      <p class="small text-muted mb-0">Seri, renk ve kategori bazında stok; düşük stok uyarıları.</p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-file-earmark-pdf"></i>
+      <h3 class="h6 mb-1">PDF'ten Otomatik Okuma</h3>
+      <p class="small text-muted mb-0">Fatura, sipariş ve dekontları yapay zeka ile otomatik işleyin.</p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-arrow-left-right"></i>
+      <h3 class="h6 mb-1">Satış &amp; Alış Yönetimi</h3>
+      <p class="small text-muted mb-0">Satış, alış faturası, cari hesap ve tahsilatlar tek ekranda.</p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-3">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-buildings"></i>
+      <h3 class="h6 mb-1">Çoklu Firma Desteği</h3>
+      <p class="small text-muted mb-0">Her firmanın verisi birbirinden tamamen ayrı ve güvenli.</p>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 landing-cta-card mb-4">
+  <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+      <h2 class="h5 mb-1 text-white">Veltix'i işletmenizde denemek ister misiniz?</h2>
+      <p class="mb-0 text-white-50">Kısa bir demo ile ihtiyaçlarınıza uygun mu görelim.</p>
+    </div>
+    <%= link_to "Demo Talep Edin", new_demo_request_path, class: "btn btn-light btn-lg text-nowrap" %>
+  </div>
+</div>

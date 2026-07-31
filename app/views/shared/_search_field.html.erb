@@ -1,0 +1,4 @@
+<div class="search-input-group">
+  <i class="bi bi-search search-input-group__icon"></i>
+  <%= text_field_tag :q, value, class: "form-control search-input-group__field", placeholder: placeholder, data: local_assigns.fetch(:data, {}) %>
+</div>

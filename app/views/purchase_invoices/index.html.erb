@@ -1,0 +1,90 @@
+<% content_for :title, "Alış Faturaları" %>
+
+<div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
+  <div>
+    <span class="flow-badge flow-badge--purchase mb-1"><i class="bi bi-truck"></i> Alış</span>
+    <h1 class="h3 mb-0">Alış Faturaları</h1>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <%= render "shared/export_menu",
+          csv_path: export_csv_purchase_invoices_path(q: params[:q], status: params[:status], from: params[:from], to: params[:to]),
+          pdf_path: export_pdf_purchase_invoices_path(q: params[:q], status: params[:status], from: params[:from], to: params[:to]) %>
+    <% if policy(PurchaseInvoice).create? %>
+      <%= link_to new_manual_purchase_invoices_path, class: "btn btn-purchase btn-lg" do %><i class="bi bi-bag-plus"></i> Alış Yap<% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: purchase_invoices_path, method: :get, class: "row g-2 align-items-end" do %>
+      <div class="col-md-3">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Fatura no veya tedarikçi adı..." %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :status, "Durum", class: "form-label mb-1" %>
+        <%= select_tag :status, options_for_select([ [ "Beklemede", "pending" ], [ "Onaylandı", "approved" ] ], params[:status]), include_blank: "Tümü", class: "form-select" %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :from, "Başlangıç", class: "form-label mb-1" %>
+        <%= date_field_tag :from, params[:from], class: "form-control" %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :to, "Bitiş", class: "form-label mb-1" %>
+        <%= date_field_tag :to, params[:to], class: "form-control" %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+        <% if params[:q].present? || params[:status].present? || params[:from].present? || params[:to].present? %>
+          <%= link_to "Temizle", purchase_invoices_path, class: "btn btn-link" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th><%= sortable_header :invoice_number, "Fatura No" %></th>
+      <th>Tedarikçi</th>
+      <th><%= sortable_header :invoice_date, "Tarih" %></th>
+      <th><%= sortable_header :status, "Durum" %></th>
+      <th class="text-end">İşlemler</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @purchase_invoices.each do |invoice| %>
+      <tr>
+        <td><%= invoice.invoice_number %></td>
+        <td>
+          <% if policy(invoice.supplier).show? %>
+            <%= link_to invoice.supplier.name, supplier_path(invoice.supplier) %>
+          <% else %>
+            <%= invoice.supplier.name %>
+          <% end %>
+        </td>
+        <td><%= invoice.invoice_date %></td>
+        <td>
+          <span class="badge <%= invoice.approved? ? "badge-soft-success" : "badge-soft-warning" %>">
+            <%= invoice.approved? ? "Onaylandı" : "Beklemede" %>
+          </span>
+        </td>
+        <td class="text-end">
+          <%= render layout: "shared/actions_menu" do %>
+            <% if policy(invoice).edit? %>
+              <% target_path = invoice.needs_line_matching? ? edit_purchase_invoice_path(invoice) : items_purchase_invoice_path(invoice) %>
+              <li><%= link_to target_path, class: "dropdown-item" do %><i class="bi bi-eye"></i> <%= invoice.approved? ? "Görüntüle" : "Devam Et" %><% end %></li>
+            <% end %>
+            <% if policy(invoice).destroy? %>
+              <li><%= button_to purchase_invoice_path(invoice), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

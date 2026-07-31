@@ -1,0 +1,18 @@
+<nav class="guest-navbar">
+  <div class="guest-navbar__inner">
+    <%= link_to root_path, class: "guest-navbar__brand" do %>
+      <%= render "shared/veltix_logo", size: 24 %>
+      <span><%= Veltix::PLATFORM_NAME %></span>
+    <% end %>
+
+    <div class="guest-navbar__links">
+      <%= link_to "Platform", platform_path, class: "guest-navbar__link #{'active' if current_page?(platform_path)}" %>
+      <%= link_to "Çözümler", solutions_path, class: "guest-navbar__link #{'active' if current_page?(solutions_path)}" %>
+      <%= link_to "Fiyatlandırma", pricing_path, class: "guest-navbar__link #{'active' if current_page?(pricing_path)}" %>
+      <%= link_to "Destek", support_path, class: "guest-navbar__link #{'active' if current_page?(support_path)}" %>
+      <%= link_to "Hakkımızda", about_path, class: "guest-navbar__link #{'active' if current_page?(about_path)}" %>
+    </div>
+
+    <%= link_to new_session_path, class: "btn btn-outline-light btn-sm" do %><i class="bi bi-box-arrow-in-right"></i> Giriş Yap<% end %>
+  </div>
+</nav>

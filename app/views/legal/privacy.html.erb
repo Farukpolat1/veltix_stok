@@ -1,0 +1,47 @@
+<% content_for :title, "Gizlilik Politikası" %>
+
+<div class="row justify-content-center my-4">
+  <div class="col-lg-9">
+    <div class="alert alert-warning d-flex gap-2">
+      <i class="bi bi-exclamation-triangle fs-5"></i>
+      <div>
+        <strong>Şablon metin.</strong> Bu sayfa yer tutucu (taslak) bir Gizlilik Politikası
+        içerir; gerçek kullanıcılara yayınlanmadan önce bir hukuk danışmanına
+        onaylatılmalı ve firmanıza ait gerçek bilgilerle güncellenmelidir.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-4 p-lg-5">
+        <h1 class="h3 mb-4">Gizlilik Politikası</h1>
+
+        <h2 class="h6 text-uppercase text-muted">1. Kapsam</h2>
+        <p>Bu Gizlilik Politikası, Veltix platformunu ("Hizmet") kullanırken toplanan bilgilerin nasıl işlendiğini açıklar.</p>
+
+        <h2 class="h6 text-uppercase text-muted mt-4">2. Toplanan Bilgiler</h2>
+        <ul>
+          <li>Hesap bilgileri: ad, e-posta adresi, firma bilgileri</li>
+          <li>Kullanım verileri: oturum açma zamanları, IP adresi, tarayıcı bilgisi</li>
+          <li>Sisteme yüklediğiniz belgeler (fatura/dekont PDF'leri) ve girdiğiniz iş verileri (ürün, satış, cari hesap vb.)</li>
+        </ul>
+
+        <h2 class="h6 text-uppercase text-muted mt-4">3. Bilgilerin Kullanımı</h2>
+        <p>Toplanan bilgiler yalnızca Hizmet'in sunulması, güvenliğinin sağlanması, teknik sorunların giderilmesi ve yasal yükümlülüklerin yerine getirilmesi amacıyla kullanılır. Firmanızın verileri, sizin ve yetkilendirdiğiniz kullanıcılarınız dışında başka firmalarla paylaşılmaz.</p>
+
+        <h2 class="h6 text-uppercase text-muted mt-4">4. Veri Güvenliği</h2>
+        <p>Verileriniz, şifreli bağlantılar (HTTPS) ve firma bazlı erişim izolasyonu ile korunur; her firma yalnızca kendi verilerine erişebilir.</p>
+
+        <h2 class="h6 text-uppercase text-muted mt-4">5. Çerezler</h2>
+        <p>Hizmet, yalnızca oturumunuzu açık tutmak için gerekli olan zorunlu oturum çerezini kullanır; reklam/takip amaçlı çerez kullanılmaz.</p>
+
+        <h2 class="h6 text-uppercase text-muted mt-4">6. Üçüncü Taraf Hizmetler</h2>
+        <p>Yüklediğiniz belgelerin otomatik okunması için yapay zeka servis sağlayıcısına (belge içeriği) aktarım yapılabilir; bu aktarım yalnızca ilgili belgeyi işlemek amacıyla, siz belge yüklediğinizde gerçekleşir.</p>
+
+        <h2 class="h6 text-uppercase text-muted mt-4">7. İletişim</h2>
+        <p>Bu politika hakkında sorularınız için <strong>[E-posta adresi]</strong> üzerinden bize ulaşabilirsiniz.</p>
+
+        <p class="text-muted small mt-4 mb-0">Son güncelleme: <%= Date.current.strftime("%d.%m.%Y") %></p>
+      </div>
+    </div>
+  </div>
+</div>

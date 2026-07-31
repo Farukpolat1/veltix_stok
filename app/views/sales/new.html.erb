@@ -1,0 +1,77 @@
+<% content_for :title, "Satış Yap" %>
+
+<span class="flow-badge flow-badge--sale mb-2"><i class="bi bi-cart-check"></i> Satış</span>
+<h1 class="h3 mb-1">Satış Yap</h1>
+<p class="text-muted">Satışı elle girin ya da müşteriden gelen sipariş/ürün listesi PDF'ini yükleyip otomatik doldurtun.</p>
+
+<% if @sale.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @sale.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-pane" type="button" role="tab" aria-controls="manual-pane" aria-selected="true">
+      <i class="bi bi-pencil-square"></i> Formu Elle Doldur
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf-pane" type="button" role="tab" aria-controls="pdf-pane" aria-selected="false">
+      <i class="bi bi-magic"></i> Fatura PDF'i Yükle
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade show active" id="manual-pane" role="tabpanel" aria-labelledby="manual-tab">
+    <%= form_with url: sales_path, method: :post, scope: :sale, class: "row g-3" do |f| %>
+      <div class="col-md-6">
+        <%= f.label :customer_id, "Mevcut Müşteri (opsiyonel)", class: "form-label" %>
+        <%= f.collection_select :customer_id, @customers, :id, :name, { include_blank: "Yeni müşteri" }, class: "form-select form-select-lg" %>
+      </div>
+
+      <div class="col-md-3">
+        <%= f.label :new_customer_name, "Yeni Müşteri Adı (opsiyonel)", class: "form-label" %>
+        <%= f.text_field :new_customer_name, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-md-3">
+        <%= f.label :new_customer_tax_number, "VKN/TCKN (opsiyonel)", class: "form-label" %>
+        <%= f.text_field :new_customer_tax_number, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-md-6">
+        <%= f.label :sale_date, "Satış Tarihi", class: "form-label" %>
+        <%= f.date_field :sale_date, value: @sale.sale_date, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-12">
+        <%= f.submit "Devam Et → Ürün Ekle", class: "btn btn-success btn-lg" %>
+        <%= link_to "Vazgeç", sales_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="tab-pane fade" id="pdf-pane" role="tabpanel" aria-labelledby="pdf-tab">
+    <p class="text-muted small">
+      Müşteriden gelen sipariş/ürün listesi PDF'ini yükleyin — yapay zeka müşteriyi
+      ve ürün satırlarını otomatik okur. Ardından satırları kontrol edip tamamlarsınız.
+    </p>
+    <%= form_with url: new_pdf_sales_path, method: :post, scope: :sale, multipart: true, data: { turbo: false }, class: "row g-3" do |f| %>
+      <div class="col-12">
+        <%= f.label :pdf_file, "Sipariş/Ürün Listesi PDF Dosyası", class: "form-label" %>
+        <%= f.file_field :pdf_file, class: "form-control", accept: ".pdf" %>
+      </div>
+
+      <div class="col-12">
+        <%= f.submit "PDF'ten Oku ve Satış Oluştur", class: "btn btn-success" %>
+        <%= link_to "Vazgeç", sales_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+</div>

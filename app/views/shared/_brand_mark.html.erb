@@ -1,0 +1,8 @@
+<div class="hero-panel__brand">
+  <% if company_logo? %>
+    <span class="hero-panel__brand-logo"><%= image_tag current_company.logo, alt: current_company.name %></span>
+  <% else %>
+    <span class="hero-panel__brand-mark"><%= company_initials %></span>
+    <span class="hero-panel__brand-name"><%= current_company&.name || "Firma" %></span>
+  <% end %>
+</div>

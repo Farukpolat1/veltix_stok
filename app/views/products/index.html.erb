@@ -1,0 +1,109 @@
+<% content_for :title, "Ürünler" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Ürünler<% if params[:low_stock].present? %> — Düşük Stoklu<% end %></h1>
+  <div class="d-flex gap-2">
+    <%= render "shared/export_menu", csv_path: export_csv_products_path(request.query_parameters), pdf_path: export_pdf_products_path(request.query_parameters) %>
+    <% if policy(Product).create? %>
+      <%= link_to "Yeni Ürün", new_product_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<%
+  product_type_icons = { "profil" => "bi-layers", "aksesuar" => "bi-gear", "diger" => "bi-box-seam" }
+%>
+<div class="row row-cols-2 row-cols-md-5 g-3 mb-3">
+  <div class="col">
+    <%= link_to request.query_parameters.except(:product_type, :low_stock, :page) do %>
+      <div class="stat-card card h-100 <%= "stat-card--active" if params[:product_type].blank? && params[:low_stock].blank? %>">
+        <div class="card-body d-flex align-items-center gap-2">
+          <span class="stat-card__icon"><i class="bi bi-grid"></i></span>
+          <p class="small text-muted mb-0 flex-grow-1">Tüm Ürünler</p>
+          <span class="badge stat-card__count"><%= @total_product_count %></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <% Category::PRODUCT_TYPE_LABELS.each do |value, label| %>
+    <div class="col">
+      <%= link_to request.query_parameters.merge(product_type: value).except(:low_stock, :page) do %>
+        <div class="stat-card card h-100 <%= "stat-card--active" if params[:product_type] == value %>">
+          <div class="card-body d-flex align-items-center gap-2">
+            <span class="stat-card__icon"><i class="bi <%= product_type_icons[value] %>"></i></span>
+            <p class="small text-muted mb-0 flex-grow-1"><%= label %></p>
+            <span class="badge stat-card__count"><%= @product_type_counts[value] || 0 %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+  <div class="col">
+    <%= link_to request.query_parameters.merge(low_stock: 1).except(:product_type, :page) do %>
+      <div class="stat-card card h-100 <%= "stat-card--active" if params[:low_stock].present? %>">
+        <div class="card-body d-flex align-items-center gap-2">
+          <span class="stat-card__icon <%= "stat-card__icon--warning" if @low_stock_count.positive? %>"><i class="bi bi-exclamation-triangle"></i></span>
+          <p class="small text-muted mb-0 flex-grow-1">Düşük Stoklu</p>
+          <span class="badge stat-card__count <%= "stat-card__count--warning" if @low_stock_count.positive? %>"><%= @low_stock_count %></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: products_path, method: :get, class: "row g-2 align-items-end" do %>
+      <% if params[:product_type].present? %><%= hidden_field_tag :product_type, params[:product_type] %><% end %>
+      <% if params[:low_stock].present? %><%= hidden_field_tag :low_stock, params[:low_stock] %><% end %>
+      <div class="col-md-4">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Ürün adı veya kodu..." %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+        <% if params[:q].present? %>
+          <%= link_to "Temizle", request.query_parameters.except(:q, :page), class: "btn btn-link" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th><%= sortable_header :code, "Kod" %></th>
+      <th><%= sortable_header :name, "Ad" %></th>
+      <th><%= sortable_header :category, "Kategori" %></th>
+      <th><%= sortable_header :unit, "Birim" %></th>
+      <th class="text-end"><%= sortable_header :stock_quantity, "Stok" %></th>
+      <th class="text-end"><%= sortable_header :min_stock_level, "Min. Stok" %></th>
+      <th class="text-end">İşlemler</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @products.each do |product| %>
+      <tr class="<%= "table-warning" if product.low_stock? %>">
+        <td><%= product.code %></td>
+        <td><%= product.name %></td>
+        <td><%= category_badge(product.category) %></td>
+        <td><%= product.unit_label %></td>
+        <td class="text-end"><%= product.stock_quantity %></td>
+        <td class="text-end"><%= product.min_stock_level %></td>
+        <td class="text-end">
+          <%= render layout: "shared/actions_menu" do %>
+            <% if policy(product).update? %>
+              <li><%= link_to edit_product_path(product), class: "dropdown-item" do %><i class="bi bi-pencil"></i> Düzenle<% end %></li>
+            <% end %>
+            <% if policy(product).destroy? %>
+              <li><%= button_to product_path(product), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

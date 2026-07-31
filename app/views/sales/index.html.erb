@@ -1,0 +1,91 @@
+<% content_for :title, "Satışlar" %>
+
+<div class="d-flex justify-content-between align-items-center mb-2">
+  <div>
+    <span class="flow-badge flow-badge--sale mb-1"><i class="bi bi-cart-check"></i> Satış</span>
+    <h1 class="h3 mb-0">Satışlar</h1>
+  </div>
+  <div class="d-flex gap-2 flex-wrap">
+    <%= render "shared/export_menu",
+          csv_path: export_csv_sales_path(q: params[:q], status: params[:status], from: params[:from], to: params[:to]),
+          pdf_path: export_pdf_sales_path(q: params[:q], status: params[:status], from: params[:from], to: params[:to]) %>
+    <% if policy(Sale).create? %>
+      <%= link_to new_sale_path, class: "btn btn-success btn-lg" do %><i class="bi bi-bag-plus"></i> Satış Yap<% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: sales_path, method: :get, class: "row g-2 align-items-end" do %>
+      <div class="col-md-3">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Satış no veya müşteri adı..." %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :status, "Durum", class: "form-label mb-1" %>
+        <%= select_tag :status, options_for_select([ [ "Beklemede", "pending" ], [ "Onaylandı", "approved" ] ], params[:status]), include_blank: "Tümü", class: "form-select" %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :from, "Başlangıç", class: "form-label mb-1" %>
+        <%= date_field_tag :from, params[:from], class: "form-control" %>
+      </div>
+      <div class="col-md-2">
+        <%= label_tag :to, "Bitiş", class: "form-label mb-1" %>
+        <%= date_field_tag :to, params[:to], class: "form-control" %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+        <% if params[:q].present? || params[:status].present? || params[:from].present? || params[:to].present? %>
+          <%= link_to "Temizle", sales_path, class: "btn btn-link" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th><%= sortable_header :sale_number, "Satış No" %></th>
+      <th>Sipariş No</th>
+      <th>Müşteri</th>
+      <th><%= sortable_header :sale_date, "Tarih" %></th>
+      <th><%= sortable_header :status, "Durum" %></th>
+      <th class="text-end">İşlemler</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @sales.each do |sale| %>
+      <tr>
+        <td><%= sale.sale_number %></td>
+        <td><%= sale.external_order_number %></td>
+        <td>
+          <% if policy(sale.customer).show? %>
+            <%= link_to sale.customer.name, customer_path(sale.customer) %>
+          <% else %>
+            <%= sale.customer.name %>
+          <% end %>
+        </td>
+        <td><%= sale.sale_date %></td>
+        <td>
+          <span class="badge <%= sale.approved? ? "badge-soft-success" : "badge-soft-warning" %>">
+            <%= sale.approved? ? "Onaylandı" : "Beklemede" %>
+          </span>
+        </td>
+        <td class="text-end">
+          <%= render layout: "shared/actions_menu" do %>
+            <% if policy(sale).items? %>
+              <li><%= link_to items_sale_path(sale), class: "dropdown-item" do %><i class="bi bi-eye"></i> <%= sale.approved? ? "Görüntüle" : "Devam Et" %><% end %></li>
+            <% end %>
+            <% if policy(sale).destroy? %>
+              <li><%= button_to sale_path(sale), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

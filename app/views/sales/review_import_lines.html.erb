@@ -1,0 +1,65 @@
+<% content_for :title, "PDF'ten Ürün Ekle — #{@sale.sale_number}" %>
+
+<span class="flow-badge flow-badge--sale mb-2"><i class="bi bi-cart-check"></i> Satış</span>
+<h1 class="h3 mb-1">PDF'ten Okunan Satırları Gözden Geçirin</h1>
+<p class="text-muted">
+  Satış: <strong><%= @sale.sale_number %></strong> · Müşteri: <%= @sale.customer.name %> —
+  aşağıdaki satırlar bu satışa eklenecek, henüz hiçbir şey kaydedilmedi.
+</p>
+
+<% if flash[:alert] %>
+  <div class="alert alert-danger"><%= flash[:alert] %></div>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="position-sticky" style="top: 1rem;">
+      <% if @pdf_blob %>
+        <iframe src="<%= rails_blob_path(@pdf_blob, disposition: "inline") %>" style="width: 100%; height: 82vh; border: 1px solid var(--bs-border-color); border-radius: 0.5rem;"></iframe>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <%= form_with url: confirm_import_lines_sale_path(@sale), method: :post, scope: :sale, data: { controller: "edit-tracker" }, class: "row g-3" do %>
+      <%= hidden_field_tag "sale[pdf_blob_signed_id]", @pdf_blob&.signed_id %>
+
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Genel İskonto %</label>
+        <%= number_field_tag "sale[discount_rate]", @data[:discount_rate] || 0, id: nil, step: "any", class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+
+      <div class="col-12">
+        <h2 class="h5 mt-3 mb-2">Ürün Satırları</h2>
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Ürün Adı</th>
+              <th style="width:110px">Miktar</th>
+              <th style="width:100px">Birim</th>
+              <th style="width:140px">Birim Fiyat</th>
+              <th style="width:100px">KDV %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% Array(@data[:lines]).each do |line| %>
+              <tr>
+                <td data-edit-tracker-target="wrapper"><%= text_field_tag "sale[lines][][name]", line[:name], id: nil, class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= number_field_tag "sale[lines][][quantity]", line[:quantity], id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= text_field_tag "sale[lines][][unit]", line[:unit], id: nil, class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= number_field_tag "sale[lines][][unit_price]", line[:unit_price], id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= number_field_tag "sale[lines][][vat_rate]", line[:vat_rate] || 20, id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-12">
+        <%= submit_tag "Satırları Ekle", class: "btn btn-success btn-lg" %>
+        <%= link_to "Vazgeç", items_sale_path(@sale), class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+</div>

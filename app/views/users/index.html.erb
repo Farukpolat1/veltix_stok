@@ -1,0 +1,71 @@
+<% content_for :title, "Kullanıcılar" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Kullanıcılar</h1>
+  <div class="d-flex gap-2">
+    <%= render "shared/export_menu", csv_path: export_csv_users_path(q: params[:q], role: params[:role]) %>
+    <% if policy(User).create? %>
+      <%= link_to "Yeni Kullanıcı", new_user_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: users_path, method: :get, class: "row g-2 align-items-end" do %>
+      <div class="col-md-4">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Ad soyad veya e-posta..." %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :role, "Rol", class: "form-label mb-1" %>
+        <%= select_tag :role, options_for_select([ [ "Firma Yöneticisi (Admin)", "admin" ], [ "İstasyon/Saha Sorumlusu", "depo" ], [ "Satış/Müşteri Hizmetleri", "satis" ] ], params[:role]), include_blank: "Tümü", class: "form-select" %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+        <% if params[:q].present? || params[:role].present? %>
+          <%= link_to "Temizle", users_path, class: "btn btn-link" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th><%= sortable_header :name, "Ad Soyad" %></th>
+      <th><%= sortable_header :email_address, "E-posta" %></th>
+      <th><%= sortable_header :role, "Rol" %></th>
+      <th class="text-end">İşlemler</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @users.each do |user| %>
+      <tr>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <span class="avatar-circle avatar-circle--sm"><%= initials_for(user.name.presence || user.email_address) %></span>
+            <%= user.name.presence || "—" %>
+          </div>
+        </td>
+        <td><%= user.email_address %></td>
+        <td>
+          <span class="badge bg-secondary"><%= { "admin" => "Admin", "depo" => "Depo", "satis" => "Satış" }[user.role] %></span>
+        </td>
+        <td class="text-end">
+          <%= render layout: "shared/actions_menu" do %>
+            <% if policy(user).update? %>
+              <li><%= link_to edit_user_path(user), class: "dropdown-item" do %><i class="bi bi-pencil"></i> Düzenle<% end %></li>
+            <% end %>
+            <% if policy(user).destroy? %>
+              <li><%= button_to user_path(user), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

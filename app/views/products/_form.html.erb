@@ -1,0 +1,46 @@
+<%= form_with model: product, class: "row g-3" do |f| %>
+  <% if product.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% product.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="col-md-6">
+    <%= f.label :code, "Ürün Kodu (boş bırakılırsa otomatik oluşur)", class: "form-label" %>
+    <%= f.text_field :code, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :name, "Ad", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="col-md-4">
+    <%= f.label :category_id, "Kategori", class: "form-label" %>
+    <%= f.collection_select :category_id, Category.order(:name), :id, :name, { prompt: true }, class: "form-select" %>
+  </div>
+
+  <div class="col-md-4">
+    <%= f.label :unit, "Birim", class: "form-label" %>
+    <%= f.select :unit, Product::UNIT_LABELS.map { |value, label| [ label, value ] }, { prompt: true }, class: "form-select" %>
+  </div>
+
+  <div class="col-md-2">
+    <%= f.label :stock_quantity, "Güncel Stok", class: "form-label" %>
+    <%= f.number_field :stock_quantity, step: "any", class: "form-control" %>
+  </div>
+
+  <div class="col-md-2">
+    <%= f.label :min_stock_level, "Kritik Stok Seviyesi", class: "form-label" %>
+    <%= f.number_field :min_stock_level, step: "any", class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "Kaydet", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", products_path, class: "btn btn-link" %>
+  </div>
+<% end %>

@@ -1,0 +1,119 @@
+<% content_for :title, "Stok Sayımı / Düzeltme Geçmişi" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Stok Düzeltme Geçmişi</h1>
+  <div class="d-flex gap-2">
+    <%= render "shared/export_menu",
+          csv_path: export_csv_stock_adjustments_path(q: params[:q], from: params[:from], to: params[:to]),
+          pdf_path: export_pdf_stock_adjustments_path(q: params[:q], from: params[:from], to: params[:to]) %>
+    <% if policy(StockAdjustment).create? %>
+      <%= link_to "Yeni Düzeltme", new_stock_adjustment_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-3">
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="stat-card__icon"><i class="bi bi-clipboard-check"></i></span>
+          <h2 class="h6 text-muted mb-0">Bugünkü Toplam Düzeltme</h2>
+        </div>
+        <p class="h4 mb-0 text-dark"><%= @today_adjustment_count %> İşlem</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="stat-card__icon stat-card__icon--success"><i class="bi bi-graph-up-arrow"></i></span>
+          <h2 class="h6 text-muted mb-0">Toplam Artış</h2>
+        </div>
+        <p class="h4 mb-0 text-success">+<%= number_with_delimiter(@today_increase_total) %></p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="stat-card__icon stat-card__icon--warning"><i class="bi bi-graph-down-arrow"></i></span>
+          <h2 class="h6 text-muted mb-0">Toplam Azalış</h2>
+        </div>
+        <p class="h4 mb-0 text-danger">-<%= number_with_delimiter(@today_decrease_total) %></p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: stock_adjustments_path, method: :get, class: "row g-2 align-items-end", data: { controller: "auto-submit" } do %>
+      <div class="col-md-4">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Ürün adı ara...", data: { action: "input->auto-submit#submit" } %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :from, "Başlangıç", class: "form-label mb-1" %>
+        <%= date_field_tag :from, params[:from], class: "form-control", data: { action: "change->auto-submit#submitNow" } %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :to, "Bitiş", class: "form-label mb-1" %>
+        <%= date_field_tag :to, params[:to], class: "form-control", data: { action: "change->auto-submit#submitNow" } %>
+      </div>
+      <div class="col-auto">
+        <% if params[:q].present? || params[:from].present? || params[:to].present? %>
+          <%= link_to stock_adjustments_path, class: "btn btn-outline-secondary", title: "Filtreleri Sıfırla" do %><i class="bi bi-x-lg"></i><% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="text-muted small"><%= @total_count %> düzeltme bulundu.</p>
+
+<table class="table table-flat align-middle">
+  <thead>
+    <tr>
+      <th>Tarih</th>
+      <th>Ürün</th>
+      <th class="text-end">Önce</th>
+      <th class="text-end">Sonra</th>
+      <th class="text-end">Fark</th>
+      <th>Sebep</th>
+      <th>Kullanıcı</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stock_adjustments.each do |adj| %>
+      <tr>
+        <td><%= adj.adjusted_at.strftime("%d.%m.%Y %H:%M") %></td>
+        <td><%= adj.product.name %></td>
+        <td class="text-end"><%= adj.quantity_before %></td>
+        <td class="text-end"><%= adj.quantity_after %></td>
+        <td class="text-end">
+          <span class="badge <%= adj.difference.negative? ? "badge-soft-danger" : "badge-soft-success" %>">
+            <%= adj.difference.positive? ? "+" : "" %><%= adj.difference %>
+          </span>
+        </td>
+        <td>
+          <% if adj.reason.present? && adj.reason.length > 25 %>
+            <span title="<%= adj.reason %>"><%= truncate(adj.reason, length: 25) %> <i class="bi bi-info-circle text-muted"></i></span>
+          <% else %>
+            <%= adj.reason %>
+          <% end %>
+        </td>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <span class="avatar-circle avatar-circle--sm"><%= initials_for(adj.user.display_name) %></span>
+            <%= adj.user.display_name %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

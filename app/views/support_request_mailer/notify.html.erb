@@ -1,0 +1,7 @@
+<p><strong><%= @company_name %></strong> firmasından yeni bir talep geldi:</p>
+<ul>
+  <li><strong>Gönderen:</strong> <%= @user_name %></li>
+  <li><strong>E-posta:</strong> <%= @user_email %></li>
+  <li><strong>Firma:</strong> <%= @company_name %></li>
+</ul>
+<p><strong>Mesaj:</strong><br><%= simple_format(@message) %></p>

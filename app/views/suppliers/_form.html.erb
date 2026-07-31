@@ -1,0 +1,64 @@
+<%= form_with model: supplier, class: "row g-3" do |f| %>
+  <% if supplier.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% supplier.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="col-md-8">
+    <%= f.label :name, "Firma Adı", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="col-md-4">
+    <%= f.label :phone, "Telefon", class: "form-label" %>
+    <%= f.text_field :phone, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :code, "Cari Kodu (opsiyonel, eski muhasebe programından)", class: "form-label" %>
+    <%= f.text_field :code, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :opening_balance, "Devir Bakiyesi (sistem öncesi, opsiyonel)", class: "form-label" %>
+    <%= f.number_field :opening_balance, step: "any", class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.label :address, "Adres", class: "form-label" %>
+    <%= f.text_area :address, class: "form-control", rows: 2 %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :tax_number, "VKN/TCKN (opsiyonel, e-fatura eşleştirmesi için)", class: "form-label" %>
+    <%= f.text_field :tax_number, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :tax_office, "Vergi Dairesi (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :tax_office, class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <div class="form-label">Hangi Ürün Kategorilerini Tedarik Ediyor?</div>
+    <%= f.hidden_field :category_ids, multiple: true, value: "" %>
+    <div class="row">
+      <% @categories.each do |category| %>
+        <div class="col-md-3 col-6 form-check">
+          <%= check_box_tag "supplier[category_ids][]", category.id, supplier.category_ids.include?(category.id), id: "category_#{category.id}", class: "form-check-input" %>
+          <%= label_tag "category_#{category.id}", category.name, class: "form-check-label" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "Kaydet", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", suppliers_path, class: "btn btn-link" %>
+  </div>
+<% end %>

@@ -1,0 +1,47 @@
+<% content_for :title, "Giriş Yap" %>
+
+<div class="login-stage">
+  <div class="login-stage__glow"></div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-7 col-lg-5">
+      <div class="landing-login-card card border-0 shadow-lg">
+        <div class="landing-login-card__accent"></div>
+        <div class="card-body p-4 p-lg-5">
+          <div class="landing-login-card__brand">
+            <%= render "shared/veltix_logo", size: 38 %>
+          </div>
+
+          <h1 class="h4 mb-1 text-center">Tekrar hoş geldiniz</h1>
+          <p class="text-muted small mb-4 text-center">Firmanıza ait hesap bilgilerinizle giriş yapın.</p>
+
+          <% if flash[:alert] %>
+            <div class="alert alert-danger"><%= flash[:alert] %></div>
+          <% end %>
+          <% if flash[:notice] %>
+            <div class="alert alert-success"><%= flash[:notice] %></div>
+          <% end %>
+
+          <%= form_with url: session_path, class: "row g-3" do |form| %>
+            <div class="col-12">
+              <%= form.label :email_address, "E-posta", class: "form-label" %>
+              <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "form-control form-control-lg" %>
+            </div>
+            <div class="col-12">
+              <%= form.label :password, "Şifre", class: "form-label" %>
+              <%= form.password_field :password, required: true, autocomplete: "current-password", maxlength: 72, class: "form-control form-control-lg" %>
+            </div>
+            <div class="col-12 mt-4">
+              <%= form.submit "Giriş Yap", class: "btn btn-primary btn-lg w-100" %>
+            </div>
+          <% end %>
+
+          <div class="text-center mt-3 d-flex justify-content-center gap-3">
+            <%= link_to "Şifremi unuttum", new_password_path, class: "small" %>
+            <%= link_to "Hesabımı onayla", new_confirmation_path, class: "small" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

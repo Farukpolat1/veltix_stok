@@ -1,0 +1,73 @@
+<%= form_with model: category, class: "row g-3", data: { controller: "category-type-fields" } do |f| %>
+  <% if category.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% category.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="col-md-6">
+    <%= f.label :product_type, "Çeşit", class: "form-label" %>
+    <%= f.select :product_type, Category::PRODUCT_TYPE_LABELS.map { |value, label| [ label, value ] }, {},
+          class: "form-select form-select-lg",
+          data: { category_type_fields_target: "typeSelect", action: "change->category-type-fields#update" } %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :code, "Kategori Kodu (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :code, class: "form-control form-control-lg", placeholder: "Örn: PRF-BEYAZ-KASA" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.label :name, "Ad", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="col-12 row g-3 mb-0" data-category-type-fields-target="profilFields">
+    <div class="col-md-6">
+      <%= f.label :series, "Seri (örn. 70lik, 80lik, Sürme)", class: "form-label" %>
+      <%= f.select :series, Category.series_options, { include_blank: "Seçiniz" }, class: "form-select" %>
+      <div class="form-text">Listede yok mu? <%= link_to "Yeni seri ekle", category_options_path, class: "link-primary" %>.</div>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :color, "Renk", class: "form-label" %>
+      <%= f.select :color, Category.color_options, { include_blank: "Seçiniz" }, class: "form-select" %>
+      <div class="form-text">Egepen Deceuninck standart renk kartelası. Listede yok mu? <%= link_to "Yeni renk ekle", category_options_path, class: "link-primary" %>.</div>
+    </div>
+  </div>
+
+  <div class="col-12 row g-3 mb-0" data-category-type-fields-target="aksesuarFields">
+    <div class="col-md-6">
+      <%= f.label :series, "Hangi Seri İçin (opsiyonel)", class: "form-label" %>
+      <%= f.select :series, Category.series_options, { include_blank: "Seçiniz" }, class: "form-select" %>
+      <div class="form-text">Listede yok mu? <%= link_to "Yeni seri ekle", category_options_path, class: "link-primary" %>.</div>
+    </div>
+    <div class="col-md-6">
+      <%= f.label :accessory_type, "Alt Tür", class: "form-label" %>
+      <%= f.select :accessory_type, Category.accessory_type_options, { include_blank: "Seçiniz" }, class: "form-select" %>
+      <div class="form-text">Listede yok mu? <%= link_to "Yeni alt tür ekle", category_options_path, class: "link-primary" %>.</div>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :brand, "Marka (opsiyonel)", class: "form-label" %>
+    <%= f.select :brand, Category.brand_options, { include_blank: "Seçiniz" }, class: "form-select" %>
+    <div class="form-text">Listede yok mu? <%= link_to "Yeni marka ekle", category_options_path, class: "link-primary" %>.</div>
+  </div>
+
+  <% Category.custom_option_groups.each do |group| %>
+    <div class="col-md-6">
+      <%= f.label nil, group.name, class: "form-label" %>
+      <%= select_tag "category[custom_attributes][#{group.name}]", options_for_select(group.category_options.ordered.pluck(:name), category.custom_attributes[group.name]), include_blank: "Seçiniz", class: "form-select" %>
+      <div class="form-text">Listede yok mu? <%= link_to "Yeni #{group.name.downcase} ekle", category_options_path, class: "link-primary" %>.</div>
+    </div>
+  <% end %>
+
+  <div class="col-12">
+    <%= f.submit "Kaydet", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", categories_path, class: "btn btn-link" %>
+  </div>
+<% end %>

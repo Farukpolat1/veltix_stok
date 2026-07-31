@@ -1,0 +1,56 @@
+<%= form_with model: customer, class: "row g-3" do |f| %>
+  <% if customer.errors.any? %>
+    <div class="alert alert-danger">
+      <ul class="mb-0">
+        <% customer.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="col-md-8">
+    <%= f.label :name, "Müşteri Adı", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="col-md-4">
+    <%= f.label :phone, "Telefon", class: "form-label" %>
+    <%= f.text_field :phone, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :code, "Cari Kodu (opsiyonel, eski muhasebe programından)", class: "form-label" %>
+    <%= f.text_field :code, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :opening_balance, "Devir Bakiyesi (sistem öncesi, opsiyonel)", class: "form-label" %>
+    <%= f.number_field :opening_balance, step: "any", class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.label :address, "Adres", class: "form-label" %>
+    <%= f.text_area :address, class: "form-control", rows: 2 %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :il, "İl", class: "form-label" %>
+    <%= f.text_field :il, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :tax_number, "VKN/TCKN (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :tax_number, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :tax_office, "Vergi Dairesi (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :tax_office, class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "Kaydet", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", customers_path, class: "btn btn-link" %>
+  </div>
+<% end %>

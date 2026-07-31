@@ -1,0 +1,64 @@
+<% content_for :title, "Marka / Renk / Alt Tür Seçenekleri" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Özellik Grupları ve Seçenekleri</h1>
+  <%= link_to "Kategorilere Dön", categories_path, class: "btn btn-outline-secondary" %>
+</div>
+<p class="text-muted mb-4">
+  Kategori eklerken kullanılan Marka, Renk, Aksesuar Alt Türü ve Seri listeleri burada yönetilir.
+  Bunların dışında kendi özel bir grup da (ör. "Kalınlık", "Cam Tipi") açıp altına kendi değerlerinizi ekleyebilirsiniz —
+  koda dokunmadan.
+</p>
+
+<% if flash[:alert] %>
+  <div class="alert alert-danger"><%= flash[:alert] %></div>
+<% end %>
+
+<% if policy(CategoryOptionGroup).create? %>
+  <div class="card mb-4">
+    <div class="card-body">
+      <h2 class="h6 mb-2"><i class="bi bi-plus-square"></i> Yeni Özellik Grubu Ekle</h2>
+      <p class="text-muted small mb-2">Örn. "Kalınlık", "Cam Tipi" gibi tamamen yeni bir başlık açın, sonra altına kendi değerlerinizi ekleyin.</p>
+      <%= form_with model: @new_group, url: category_option_groups_path, class: "d-flex gap-2" do |f| %>
+        <%= f.text_field :name, placeholder: "Yeni grup adı, ör. Kalınlık", class: "form-control" %>
+        <%= f.submit "Grup Ekle", class: "btn btn-primary text-nowrap" %>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="row g-4">
+  <% @groups.each do |group| %>
+    <div class="col-md-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <h2 class="h6 mb-0"><%= group.name %></h2>
+            <% if policy(group).destroy? && !group.core? %>
+              <%= button_to "Grubu Sil", category_option_group_path(group), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "\"#{group.name}\" grubu ve tüm değerleri silinecek. Emin misiniz?" } } %>
+            <% end %>
+          </div>
+
+          <% if policy(CategoryOption).create? %>
+            <%= form_with model: @new_option, url: category_options_path, class: "d-flex gap-2 mb-3" do |f| %>
+              <%= f.hidden_field :category_option_group_id, value: group.id %>
+              <%= f.text_field :name, placeholder: "Yeni değer", class: "form-control form-control-sm" %>
+              <%= f.submit "Ekle", class: "btn btn-sm btn-primary text-nowrap" %>
+            <% end %>
+          <% end %>
+
+          <ul class="list-group list-group-flush">
+            <% group.category_options.ordered.each do |option| %>
+              <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                <%= option.name %>
+                <% if policy(option).destroy? %>
+                  <%= button_to "Sil", category_option_path(option), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

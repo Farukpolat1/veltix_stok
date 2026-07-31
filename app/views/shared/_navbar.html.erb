@@ -1,0 +1,67 @@
+<nav class="navbar navbar-expand-lg navbar-dark app-navbar">
+  <div class="container">
+    <%= link_to root_path, class: "navbar-brand d-flex align-items-center gap-2" do %>
+      <% if company_logo? %>
+        <span class="navbar-logo-chip"><%= image_tag current_company.logo, alt: current_company.name, class: "navbar-logo" %></span>
+      <% else %>
+        <span class="navbar-logo-initials"><%= company_initials %></span>
+      <% end %>
+      <%= current_company&.name || Veltix::PLATFORM_NAME %>
+    <% end %>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Menüyü aç/kapat">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="mainNav">
+      <div class="navbar-nav nav-tabs-flat me-auto">
+        <%= link_to products_path, class: "nav-link #{'active' if current_nav_section == :stok}" do %><i class="bi bi-boxes"></i> Stok<% end %>
+
+        <% if current_user.admin? || current_user.depo? %>
+          <%= link_to suppliers_path, class: "nav-link #{'active' if current_nav_section == :alis}" do %><i class="bi bi-truck"></i> Alış<% end %>
+        <% end %>
+
+        <% if current_user.admin? || current_user.satis? %>
+          <%= link_to customers_path, class: "nav-link #{'active' if current_nav_section == :satis}" do %><i class="bi bi-cart-check"></i> Satış<% end %>
+        <% end %>
+
+        <% if current_user.admin? %>
+          <%= link_to users_path, class: "nav-link #{'active' if current_nav_section == :yonetim}" do %><i class="bi bi-gear"></i> Yönetim<% end %>
+        <% end %>
+      </div>
+
+      <button type="button" class="navbar-text navbar-profile-link small me-3 d-none d-lg-inline btn btn-link p-0 border-0" data-bs-toggle="modal" data-bs-target="#supportRequestModal"><i class="bi bi-headset me-1"></i>Talep Oluştur</button>
+      <%= link_to edit_profile_path, class: "navbar-text navbar-profile-link small me-3 d-none d-lg-inline" do %><i class="bi bi-person-circle me-1"></i><%= current_user.display_name %><% end %>
+      <%= button_to session_path, method: :delete, class: "btn btn-outline-light btn-sm" do %><i class="bi bi-box-arrow-right"></i> Çıkış Yap<% end %>
+    </div>
+  </div>
+</nav>
+
+<% if current_nav_section %>
+  <div class="sub-tab-bar">
+    <div class="container">
+      <nav class="sub-tabs">
+        <% case current_nav_section %>
+        <% when :stok %>
+          <%= link_to "Ürünler", products_path, class: sub_tab_class(:products) %>
+          <%= link_to "Kategoriler", categories_path, class: sub_tab_class(:categories) %>
+          <%= link_to "Stok Hareketleri", stock_movements_path, class: sub_tab_class(:stock_movements) %>
+          <% if current_user.admin? || current_user.depo? %>
+            <%= link_to "Stok Sayımı", stock_adjustments_path, class: sub_tab_class(:stock_adjustments) %>
+          <% end %>
+        <% when :alis %>
+          <%= link_to "Tedarikçiler", suppliers_path, class: sub_tab_class(:suppliers) %>
+          <%= link_to "Alış Faturaları", purchase_invoices_path, class: sub_tab_class(:purchase_invoices, :purchase_invoice_items) %>
+        <% when :satis %>
+          <%= link_to "Müşteriler", customers_path, class: sub_tab_class(:customers) %>
+          <%= link_to "Satışlar", sales_path, class: sub_tab_class(:sales, :sale_items) %>
+        <% when :yonetim %>
+          <%= link_to "İş Özeti", dashboard_summary_path, class: sub_tab_class(:dashboard) %>
+          <%= link_to "Kullanıcılar", users_path, class: sub_tab_class(:users) %>
+          <%= link_to "Firma Ayarları", edit_company_settings_path, class: sub_tab_class(:company_settings) %>
+          <% if current_user.super_admin? %>
+            <%= link_to "Firmalar", companies_path, class: sub_tab_class(:companies) %>
+          <% end %>
+        <% end %>
+      </nav>
+    </div>
+  </div>
+<% end %>

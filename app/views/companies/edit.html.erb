@@ -1,0 +1,74 @@
+<% content_for :title, "#{@company.name} - Düzenle" %>
+
+<span class="flow-badge flow-badge--purchase mb-2"><i class="bi bi-buildings"></i> Platform</span>
+<h1 class="h3 mb-1">"<%= @company.name %>" Firmasını Düzenle</h1>
+<p class="text-muted">Bu firmanın marka/adres/vergi bilgilerini platform sahibi olarak düzenliyorsunuz.</p>
+
+<% if @company.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @company.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @company, url: company_path(@company), method: :patch, class: "row g-3" do |f| %>
+  <div class="col-12">
+    <label class="form-label">Logo</label>
+    <div class="mb-2">
+      <% if @company.logo.attached? %>
+        <%= image_tag @company.logo, style: "max-height: 80px;" %>
+      <% else %>
+        <span class="text-muted">Henüz logo yüklenmedi.</span>
+      <% end %>
+    </div>
+    <%= f.file_field :logo, accept: "image/png,image/jpeg,image/svg+xml", class: "form-control" %>
+  </div>
+
+  <div class="col-md-8">
+    <%= f.label :name, "Firma Adı", class: "form-label" %>
+    <%= f.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="col-md-4">
+    <%= f.label :phone, "Telefon", class: "form-label" %>
+    <%= f.text_field :phone, class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.label :slogan, "Slogan (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :slogan, class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.label :address, "Adres", class: "form-label" %>
+    <%= f.text_area :address, rows: 2, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :tax_number, "VKN", class: "form-label" %>
+    <%= f.text_field :tax_number, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :tax_office, "Vergi Dairesi", class: "form-label" %>
+    <%= f.text_field :tax_office, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :website, "Web Sitesi (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :website, class: "form-control" %>
+  </div>
+
+  <div class="col-md-6">
+    <%= f.label :email, "E-posta (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :email, class: "form-control" %>
+  </div>
+
+  <div class="col-12 mt-3">
+    <%= f.submit "Kaydet", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", companies_path, class: "btn btn-link" %>
+  </div>
+<% end %>

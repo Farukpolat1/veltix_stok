@@ -1,0 +1,37 @@
+<% content_for :title, "Satış Düzenle: #{@sale.sale_number}" %>
+
+<span class="flow-badge flow-badge--sale mb-2"><i class="bi bi-cart-check"></i> Satış</span>
+<h1 class="h3 mb-1">Satış Düzenle: <%= @sale.sale_number %></h1>
+<p class="text-muted">Yanlış müşteri, tarih ya da sipariş no girildiyse burada düzeltin.</p>
+
+<% if @sale.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @sale.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @sale, url: sale_path(@sale), method: :patch, class: "row g-3" do |f| %>
+  <div class="col-md-6">
+    <%= f.label :customer_id, "Müşteri", class: "form-label" %>
+    <%= f.collection_select :customer_id, @customers, :id, :name, {}, class: "form-select form-select-lg" %>
+  </div>
+
+  <div class="col-md-3">
+    <%= f.label :sale_date, "Satış Tarihi", class: "form-label" %>
+    <%= f.date_field :sale_date, class: "form-control form-control-lg" %>
+  </div>
+
+  <div class="col-md-3">
+    <%= f.label :external_order_number, "Sipariş No (opsiyonel)", class: "form-label" %>
+    <%= f.text_field :external_order_number, class: "form-control form-control-lg" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "Kaydet", class: "btn btn-primary btn-lg" %>
+    <%= link_to "Vazgeç", items_sale_path(@sale), class: "btn btn-link" %>
+  </div>
+<% end %>

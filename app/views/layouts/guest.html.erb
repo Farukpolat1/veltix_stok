@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+  <%= render "layouts/head" %>
+
+  <body>
+    <div class="app-main">
+      <%= render "shared/guest_navbar" %>
+
+      <main class="guest-content container">
+        <% if notice %>
+          <div class="alert alert-success"><%= notice %></div>
+        <% end %>
+        <% if alert %>
+          <div class="alert alert-danger"><%= alert %></div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

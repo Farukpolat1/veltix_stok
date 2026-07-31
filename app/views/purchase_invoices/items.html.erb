@@ -1,0 +1,106 @@
+<% content_for :title, "Fatura: Ürün Ekle" %>
+
+<div class="d-flex justify-content-between align-items-start mb-2">
+  <div>
+    <span class="flow-badge flow-badge--purchase mb-2"><i class="bi bi-truck"></i> Alış</span>
+    <h1 class="h3 mb-1">Fatura: <%= @purchase_invoice.invoice_number %></h1>
+  </div>
+  <div class="d-flex gap-2">
+    <% if @purchase_invoice.purchase_invoice_lines.any? %>
+      <%= link_to receipt_purchase_invoice_path(@purchase_invoice), target: "_blank", class: "btn btn-purchase btn-lg" do %><i class="bi bi-file-earmark-pdf"></i> PDF İrsaliye İndir<% end %>
+    <% end %>
+    <%= link_to purchase_invoices_path, class: "btn btn-outline-secondary btn-sm" do %><i class="bi bi-arrow-left"></i> Faturalara Dön<% end %>
+  </div>
+</div>
+<p class="text-muted mb-3">
+  Tedarikçi: <% if policy(@purchase_invoice.supplier).show? %><%= link_to @purchase_invoice.supplier.name, supplier_path(@purchase_invoice.supplier) %><% else %><%= @purchase_invoice.supplier.name %><% end %> ·
+  Tarih: <%= @purchase_invoice.invoice_date %>
+</p>
+
+<% if @purchase_invoice.source_pdfs.attached? %>
+  <p class="text-muted mb-3">
+    <i class="bi bi-paperclip"></i> Yüklenen kaynak belgeler:
+    <% @purchase_invoice.source_pdfs.each do |pdf| %>
+      <%= link_to pdf.filename.to_s, rails_blob_path(pdf, disposition: "inline"), target: "_blank", class: "link-secondary me-2" %>
+    <% end %>
+  </p>
+<% end %>
+
+<% if flash[:alert] %>
+  <div class="alert alert-danger"><%= flash[:alert] %></div>
+<% end %>
+
+<% if @purchase_invoice.pending? %>
+  <div class="<%= "collapse" unless @purchase_invoice.purchase_invoice_lines.none? %> show" id="manual-add">
+    <%= render "shared/product_item_form",
+          url: purchase_invoice_purchase_invoice_lines_path(@purchase_invoice),
+          products: @products,
+          categories: @categories,
+          param_key: "purchase_invoice_line" %>
+  </div>
+
+  <div class="card mb-3">
+    <div class="card-body">
+      <h2 class="h6 mb-2"><i class="bi bi-file-earmark-pdf"></i> PDF'ten Ürün Ekle (opsiyonel)</h2>
+      <p class="text-muted small mb-2">Tedarikçiden gelen fatura/ürün listesi PDF'ini yükleyin, satırları önizleyip ekleyin.</p>
+      <%= form_with url: import_lines_pdf_purchase_invoice_path(@purchase_invoice), method: :post, scope: :purchase_invoice, multipart: true, data: { turbo: false }, class: "d-flex gap-2" do %>
+        <input type="file" name="purchase_invoice[pdf_file]" accept=".pdf" class="form-control">
+        <button type="submit" class="btn btn-outline-primary text-nowrap">PDF'ten Oku</button>
+      <% end %>
+    </div>
+  </div>
+<% end %>
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Fatura İçeriği</h2>
+    <table class="table table-striped align-middle mb-3">
+      <thead>
+        <tr>
+          <th>Ürün</th>
+          <th class="text-end">Miktar</th>
+          <th class="text-end">Birim Fiyat</th>
+          <th class="text-end">KDV %</th>
+          <th class="text-end">KDV Tutarı</th>
+          <th class="text-end">Toplam</th>
+          <% if @purchase_invoice.pending? %><th></th><% end %>
+        </tr>
+      </thead>
+      <tbody>
+        <% @purchase_invoice.purchase_invoice_lines.each do |line| %>
+          <tr>
+            <td><%= line.product.name %></td>
+            <td class="text-end"><%= line.quantity %></td>
+            <td class="text-end"><%= line.unit_price %></td>
+            <td class="text-end">%<%= line.vat_rate.to_i %></td>
+            <td class="text-end"><%= number_with_delimiter(line.vat_amount.round(2)) %> ₺</td>
+            <td class="text-end fw-bold"><%= number_with_delimiter(line.total_with_vat.round(2)) %> ₺</td>
+            <% if @purchase_invoice.pending? %>
+              <td class="text-end">
+                <%= button_to "Sil", purchase_invoice_purchase_invoice_line_path(@purchase_invoice, line), method: :delete, class: "btn btn-sm btn-outline-danger" %>
+              </td>
+            <% end %>
+          </tr>
+        <% end %>
+      </tbody>
+      <% if @purchase_invoice.purchase_invoice_lines.any? %>
+        <tfoot>
+          <tr class="fw-bold">
+            <td colspan="5" class="text-end">Genel Toplam (KDV Dahil)</td>
+            <td class="text-end"><%= number_with_delimiter(@purchase_invoice.purchase_invoice_lines.sum(&:total_with_vat).round(2)) %> ₺</td>
+            <% if @purchase_invoice.pending? %><td></td><% end %>
+          </tr>
+        </tfoot>
+      <% end %>
+    </table>
+
+    <% if @purchase_invoice.pending? %>
+      <%= button_to "Faturayı Tamamla ve Stoğu Güncelle", approve_purchase_invoice_path(@purchase_invoice), method: :patch, class: "btn btn-purchase btn-lg", disabled: !@purchase_invoice.approvable?, form: { data: { turbo_confirm: "Fatura tamamlanacak ve stok artırılacak. Emin misiniz?" } } %>
+      <% unless @purchase_invoice.approvable? %>
+        <p class="text-danger mt-2 mb-0">Tamamlamak için en az bir ürün eklemelisiniz.</p>
+      <% end %>
+    <% else %>
+      <span class="badge badge-soft-success">Fatura tamamlandı</span>
+    <% end %>
+  </div>
+</div>

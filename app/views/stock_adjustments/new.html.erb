@@ -1,0 +1,36 @@
+<% content_for :title, "Stok Sayımı / Düzeltme" %>
+
+<h1 class="h3 mb-1">Stok Sayımı / Düzeltme</h1>
+<p class="text-muted mb-3">Fiziksel sayımda fark bulduğunuzda (fire, kayıp, hasar, sayım hatası vb.) buradan düzeltin. Sistemdeki stok, girdiğiniz yeni sayıma göre otomatik ayarlanır ve fark Stok Hareketleri'nde kayıt altına alınır.</p>
+
+<% if @stock_adjustment.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @stock_adjustment.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with model: @stock_adjustment, url: stock_adjustments_path, class: "row g-3" do |f| %>
+  <div class="col-12 col-md-6">
+    <%= f.label :product_id, "Ürün", class: "form-label" %>
+    <%= f.collection_select :product_id, @products, :id, ->(p) { "#{p.name} (#{p.code}) — mevcut stok: #{p.stock_quantity}" }, { include_blank: "Seçiniz" }, class: "form-select form-select-lg" %>
+  </div>
+
+  <div class="col-12 col-md-3">
+    <%= f.label :quantity_after, "Sayımda Bulunan Miktar", class: "form-label" %>
+    <%= f.number_field :quantity_after, step: "any", required: true, class: "form-control form-control-lg" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.label :reason, "Sebep", class: "form-label" %>
+    <%= f.text_area :reason, rows: 2, required: true, placeholder: "Örn: Fiziksel sayım farkı, hasar, kayıp...", class: "form-control" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "Kaydet", class: "btn btn-primary btn-lg" %>
+    <%= link_to "Geçmişi Gör", stock_adjustments_path, class: "btn btn-link" %>
+  </div>
+<% end %>

@@ -1,0 +1,157 @@
+<% content_for :title, "İş Özeti" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <span class="flow-badge flow-badge--purchase mb-2"><i class="bi bi-speedometer2"></i> Yönetim</span>
+    <h1 class="h3 mb-0">İş Özeti</h1>
+  </div>
+  <%= link_to root_path, class: "btn btn-outline-secondary btn-sm" do %><i class="bi bi-arrow-left"></i> Anasayfaya Dön<% end %>
+</div>
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+  <div class="btn-group">
+    <% DashboardController::PERIOD_LABELS.each do |key, label| %>
+      <%= link_to label, dashboard_summary_path(period: key), class: "btn btn-sm #{@period == key ? "btn-primary" : "btn-outline-primary"}" %>
+    <% end %>
+  </div>
+  <%= form_with url: monthly_report_path, method: :get, data: { turbo: false }, class: "d-flex gap-1" do %>
+    <%= text_field_tag :month, Date.current.strftime("%Y-%m"), type: "month", class: "form-control form-control-sm" %>
+    <%= submit_tag "Aylık Rapor İndir", class: "btn btn-sm btn-outline-secondary text-nowrap" %>
+  <% end %>
+</div>
+
+<p class="section-eyebrow mb-2"><i class="bi bi-truck"></i> Alış · <span class="text-lowercase">detay için tıklayın</span></p>
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <%= link_to purchase_invoices_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--purchase h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Alınan Metretül</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_purchase_mtul, delimiter: ".", separator: ",") %> mtül</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-4">
+    <%= link_to purchase_invoices_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--purchase h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Alınan m²</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_purchase_m2, delimiter: ".", separator: ",") %> m²</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-4">
+    <%= link_to purchase_invoices_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--purchase h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Alış Tutarı</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_purchase_total, delimiter: ".", separator: ",") %> ₺</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="section-eyebrow mb-2"><i class="bi bi-cart-check"></i> Satış · <span class="text-lowercase">detay için tıklayın</span></p>
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <%= link_to sales_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--sale h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Satılan Metretül</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_sale_mtul, delimiter: ".", separator: ",") %> mtül</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-4">
+    <%= link_to sales_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--sale h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Satılan m²</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_sale_m2, delimiter: ".", separator: ",") %> m²</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-4">
+    <%= link_to sales_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--sale h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Satış Tutarı</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_sale_total, delimiter: ".", separator: ",") %> ₺</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="section-eyebrow mb-2"><i class="bi bi-cash-coin"></i> Cari Hareketler · <span class="text-lowercase">detay için tıklayın</span></p>
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <%= link_to customers_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--sale h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Müşteriden Tahsilat</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_customer_payments_total) %> ₺</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-6">
+    <%= link_to suppliers_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--purchase h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Tedarikçiye Ödeme</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_supplier_payments_total) %> ₺</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="section-eyebrow mb-2"><i class="bi bi-arrow-left-right"></i> Stok Hareketi · <span class="text-lowercase">detay için tıklayın</span></p>
+<div class="row g-3 mb-4">
+  <div class="col-md-3">
+    <%= link_to stock_movements_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--stock h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Stok Girişi</h2>
+          <p class="h3 mb-0 text-dark"><%= @period_stock_in %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-3">
+    <%= link_to stock_movements_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--stock h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Stok Çıkışı</h2>
+          <p class="h3 mb-0 text-dark"><%= @period_stock_out %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-3">
+    <%= link_to purchase_invoices_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--purchase h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Beklemede Alış Faturası</h2>
+          <p class="h3 mb-0 text-dark"><%= @pending_purchase_invoices_count %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col-md-3">
+    <%= link_to sales_path, class: "text-decoration-none" do %>
+      <div class="card stat-card stat-card--sale h-100">
+        <div class="card-body">
+          <h2 class="h6 text-muted">Beklemede Satış</h2>
+          <p class="h3 mb-0 text-dark"><%= @pending_sales_count %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

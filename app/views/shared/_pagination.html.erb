@@ -1,0 +1,25 @@
+<% total_count ||= nil %>
+<% if total_pages > 1 %>
+  <nav aria-label="Sayfalar" class="d-flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+    <p class="text-muted small mb-0"><%= "Toplam #{total_count} kayıt — " if total_count %>sayfa <%= page %> / <%= total_pages %></p>
+    <ul class="pagination mb-0">
+      <li class="page-item <%= "disabled" if page <= 1 %>">
+        <%= link_to "‹", page <= 1 ? "#" : url_for(request.query_parameters.merge(page: page - 1)), class: "page-link" %>
+      </li>
+      <% pagination_window(page, total_pages).each do |p| %>
+        <% if p == :gap %>
+          <li class="page-item disabled"><span class="page-link">…</span></li>
+        <% else %>
+          <li class="page-item <%= "active" if p == page %>">
+            <%= link_to p, url_for(request.query_parameters.merge(page: p)), class: "page-link" %>
+          </li>
+        <% end %>
+      <% end %>
+      <li class="page-item <%= "disabled" if page >= total_pages %>">
+        <%= link_to "›", page >= total_pages ? "#" : url_for(request.query_parameters.merge(page: page + 1)), class: "page-link" %>
+      </li>
+    </ul>
+  </nav>
+<% elsif total_count&.positive? %>
+  <p class="text-muted small mt-3 mb-0">Toplam <%= total_count %> kayıt</p>
+<% end %>

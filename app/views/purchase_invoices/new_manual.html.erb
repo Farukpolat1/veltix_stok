@@ -1,0 +1,87 @@
+<% content_for :title, "Alış Yap" %>
+
+<span class="flow-badge flow-badge--purchase mb-2"><i class="bi bi-truck"></i> Alış</span>
+<h1 class="h3 mb-1">Alış Yap</h1>
+<p class="text-muted">Faturayı elle girin ya da tedarikçiden gelen fatura PDF'ini yükleyip otomatik doldurtun.</p>
+
+<% if @purchase_invoice.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @purchase_invoice.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+  <li class="nav-item" role="presentation">
+    <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-pane" type="button" role="tab" aria-controls="manual-pane" aria-selected="true">
+      <i class="bi bi-pencil-square"></i> Formu Elle Doldur
+    </button>
+  </li>
+  <li class="nav-item" role="presentation">
+    <button class="nav-link" id="pdf-tab" data-bs-toggle="tab" data-bs-target="#pdf-pane" type="button" role="tab" aria-controls="pdf-pane" aria-selected="false">
+      <i class="bi bi-magic"></i> Fatura PDF'i Yükle
+    </button>
+  </li>
+</ul>
+
+<div class="tab-content">
+  <div class="tab-pane fade show active" id="manual-pane" role="tabpanel" aria-labelledby="manual-tab">
+    <%= form_with url: new_manual_purchase_invoices_path, method: :post, scope: :purchase_invoice, class: "row g-3" do |f| %>
+      <div class="col-md-6">
+        <%= f.label :supplier_id, "Mevcut Tedarikçi (opsiyonel)", class: "form-label" %>
+        <%= f.collection_select :supplier_id, @suppliers, :id, :name, { include_blank: "Yeni tedarikçi" }, class: "form-select form-select-lg" %>
+      </div>
+
+      <div class="col-md-3">
+        <%= f.label :new_supplier_name, "Yeni Tedarikçi Adı (opsiyonel)", class: "form-label" %>
+        <%= f.text_field :new_supplier_name, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-md-3">
+        <%= f.label :new_supplier_tax_number, "VKN/TCKN (opsiyonel)", class: "form-label" %>
+        <%= f.text_field :new_supplier_tax_number, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-md-6">
+        <%= f.label :invoice_number, "Fatura No (opsiyonel)", class: "form-label" %>
+        <%= f.text_field :invoice_number, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-md-6">
+        <%= f.label :invoice_date, "Fatura Tarihi (opsiyonel)", class: "form-label" %>
+        <%= f.date_field :invoice_date, value: @purchase_invoice.invoice_date, class: "form-control form-control-lg" %>
+      </div>
+
+      <div class="col-12">
+        <%= f.submit "Devam Et → Ürün Ekle", class: "btn btn-primary btn-lg" %>
+        <%= link_to "Vazgeç", purchase_invoices_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="tab-pane fade" id="pdf-pane" role="tabpanel" aria-labelledby="pdf-tab">
+    <p class="text-muted small">
+      Tedarikçiden gelen fatura PDF'ini yükleyin — yapay zeka fatura numarasını, tedarikçiyi
+      ve ürün satırlarını otomatik okur. Ardından eşleşmemiş satırları eşleştirip onaylarsınız.
+    </p>
+    <%= form_with url: new_pdf_purchase_invoices_path, method: :post, scope: :purchase_invoice, multipart: true, data: { turbo: false }, class: "row g-3" do |f| %>
+      <div class="col-12">
+        <%= f.label :pdf_file, "Fatura PDF Dosyası", class: "form-label" %>
+        <%= f.file_field :pdf_file, class: "form-control", accept: ".pdf" %>
+      </div>
+
+      <div class="col-12">
+        <%= f.submit "PDF'ten Oku ve İçe Aktar", class: "btn btn-primary" %>
+        <%= link_to "Vazgeç", purchase_invoices_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="text-muted small mt-3">
+  Zaten bir e-Fatura/e-Arşiv XML dosyanız mı var?
+  <%= link_to "Buradan içe aktarın", new_purchase_invoice_path %>.
+</p>

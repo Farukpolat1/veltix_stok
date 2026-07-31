@@ -1,0 +1,53 @@
+<% content_for :title, "#{@supplier.name} - Dekont Onayı" %>
+
+<h1 class="h3 mb-3">Dekont Bilgilerini Onayla</h1>
+<p class="text-muted">PDF dekontundan okunan veriler aşağıdadır. Lütfen kontrol edip onaylayın.</p>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <%= form_with model: [@supplier, @payment], local: true, class: "row g-3" do |f| %>
+
+      <% if @payment.errors.any? %>
+        <div class="col-12">
+          <div class="alert alert-danger">
+            <ul class="mb-0">
+              <% @payment.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      <% end %>
+
+      <%# Controller'dan gelen PDF imzasını formda gizli olarak tutuyoruz %>
+      <% if @pdf_signed_id.present? %>
+        <%= hidden_field_tag :pdf_signed_id, @pdf_signed_id %>
+        <div class="col-12">
+          <div class="alert alert-success py-2 mb-0">
+            <i class="bi bi-check-circle"></i> PDF Dekont başarıyla eklendi.
+          </div>
+        </div>
+      <% end %>
+
+      <div class="col-md-4">
+        <%= f.label :amount, "Tutar (₺)", class: "form-label fw-bold" %>
+        <%= f.number_field :amount, step: "any", class: "form-control" %>
+      </div>
+
+      <div class="col-md-4">
+        <%= f.label :paid_at, "Ödeme Tarihi", class: "form-label fw-bold" %>
+        <%= f.date_field :paid_at, class: "form-control" %>
+      </div>
+
+      <div class="col-md-12">
+        <%= f.label :note, "Not", class: "form-label fw-bold" %>
+        <%= f.text_field :note, class: "form-control" %>
+      </div>
+
+      <div class="col-12 mt-4">
+        <%= f.submit "Onayla ve Kaydet", class: "btn btn-success" %>
+        <%= link_to "İptal", supplier_path(@supplier), class: "btn btn-outline-secondary ms-2" %>
+      </div>
+    <% end %>
+  </div>
+</div>

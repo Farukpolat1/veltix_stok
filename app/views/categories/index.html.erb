@@ -1,0 +1,101 @@
+<% content_for :title, "Kategoriler" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Kategoriler</h1>
+  <% if policy(Category).create? %>
+    <div class="d-flex gap-2">
+      <%= link_to category_options_path, class: "btn btn-outline-secondary" do %><i class="bi bi-tag"></i> Marka/Renk/Alt Tür Yönet<% end %>
+      <%= link_to new_pdf_categories_path, class: "btn btn-outline-primary" do %><i class="bi bi-magic"></i> PDF'ten Oluştur (Yapay Zeka)<% end %>
+      <%= render "shared/export_menu", csv_path: export_csv_categories_path(request.query_parameters), pdf_path: export_pdf_categories_path(request.query_parameters) %>
+      <%= link_to "Yeni Kategori", new_category_path, class: "btn btn-primary" %>
+    </div>
+  <% end %>
+</div>
+
+<%
+  product_type_icons = { "profil" => "bi-layers", "aksesuar" => "bi-gear", "diger" => "bi-box-seam" }
+%>
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-3">
+  <div class="col">
+    <%= link_to request.query_parameters.except(:product_type, :page) do %>
+      <div class="stat-card card h-100 <%= "stat-card--active" if params[:product_type].blank? %>">
+        <div class="card-body d-flex align-items-center gap-2">
+          <span class="stat-card__icon"><i class="bi bi-grid"></i></span>
+          <p class="small text-muted mb-0 flex-grow-1">Tüm Kategoriler</p>
+          <span class="badge stat-card__count"><%= @total_category_count %></span>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <% Category::PRODUCT_TYPE_LABELS.each do |value, label| %>
+    <div class="col">
+      <%= link_to request.query_parameters.merge(product_type: value).except(:page) do %>
+        <div class="stat-card card h-100 <%= "stat-card--active" if params[:product_type] == value %>">
+          <div class="card-body d-flex align-items-center gap-2">
+            <span class="stat-card__icon"><i class="bi <%= product_type_icons[value] %>"></i></span>
+            <p class="small text-muted mb-0 flex-grow-1"><%= label %></p>
+            <span class="badge stat-card__count"><%= @product_type_counts[value] || 0 %></span>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: categories_path, method: :get, class: "row g-2 align-items-end" do %>
+      <% if params[:product_type].present? %><%= hidden_field_tag :product_type, params[:product_type] %><% end %>
+      <div class="col-md-4">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Kategori adı..." %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+        <% if params[:q].present? %>
+          <%= link_to "Temizle", request.query_parameters.except(:q, :page), class: "btn btn-link" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th><%= sortable_header :code, "Kod" %></th>
+      <th><%= sortable_header :name, "Ad" %></th>
+      <th><%= sortable_header :product_type, "Çeşit" %></th>
+      <th><%= sortable_header :series, "Seri" %></th>
+      <th>Renk / Alt Tür</th>
+      <th><%= sortable_header :brand, "Marka" %></th>
+      <th>Özel Özellikler</th>
+      <th class="text-end">İşlemler</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @categories.each do |category| %>
+      <tr>
+        <td><%= category.code %></td>
+        <td><%= category.name %></td>
+        <td><span class="category-badge"><%= Category::PRODUCT_TYPE_LABELS[category.product_type] %></span></td>
+        <td><%= category.series %></td>
+        <td><%= category.profil? ? category.color : category.aksesuar? ? category.accessory_type : nil %></td>
+        <td><%= category.brand %></td>
+        <td><%= category.custom_attributes.map { |k, v| "#{k}: #{v}" if v.present? }.compact.join(", ") %></td>
+        <td class="text-end">
+          <%= render layout: "shared/actions_menu" do %>
+            <% if policy(category).update? %>
+              <li><%= link_to edit_category_path(category), class: "dropdown-item" do %><i class="bi bi-pencil"></i> Düzenle<% end %></li>
+            <% end %>
+            <% if policy(category).destroy? %>
+              <li><%= button_to category_path(category), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

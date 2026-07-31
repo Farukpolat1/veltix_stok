@@ -1,0 +1,160 @@
+<% content_for :title, @supplier.name %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <h1 class="h3 mb-0"><%= @supplier.name %></h1>
+    <p class="text-muted mb-0">
+      <%= @supplier.phone %>
+      <% if @supplier.code.present? %> · Cari Kodu: <%= @supplier.code %><% end %>
+      <% if @supplier.tax_number.present? %> · VKN/TCKN: <%= @supplier.tax_number %><% end %>
+      <% if @supplier.tax_office.present? %> · Vergi Dairesi: <%= @supplier.tax_office %><% end %>
+    </p>
+    <% if @supplier.address.present? %>
+      <p class="text-muted mb-0"><i class="bi bi-geo-alt"></i> <%= @supplier.address %></p>
+    <% end %>
+  </div>
+  <div>
+    <%= link_to "PDF Oluştur", statement_supplier_path(@supplier), target: "_blank", class: "btn btn-outline-primary" %>
+    <%= link_to "Düzenle", edit_supplier_path(@supplier), class: "btn btn-outline-secondary" %>
+    <%= link_to "Listeye Dön", suppliers_path, class: "btn btn-link" %>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Toplam Alış</h2>
+        <p class="h4 mb-0"><%= number_with_delimiter(@supplier.total_purchased) %> ₺</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Toplam Ödeme</h2>
+        <p class="h4 mb-0"><%= number_with_delimiter(@supplier.total_paid) %> ₺</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card <%= "border-danger" if @supplier.balance.positive? %>">
+      <div class="card-body">
+        <h2 class="h6 text-muted">Kalan Borç</h2>
+        <p class="h4 mb-0 <%= "text-danger" if @supplier.balance.positive? %>"><%= number_with_delimiter(@supplier.balance) %> ₺</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<% if @pending_invoices.any? %>
+  <div class="alert alert-warning">
+    <strong>Dikkat:</strong> Bu tedarikçi için henüz <strong>onaylanmamış</strong> <%= @pending_invoices.size %> fatura var
+    (stok henüz artmadı, aşağıdaki toplamlara dahil değil):
+    <ul class="mb-0 mt-2">
+      <% @pending_invoices.each do |invoice| %>
+        <li>
+          <%= link_to "Fatura ##{invoice.invoice_number}", items_purchase_invoice_path(invoice) %>
+          (<%= invoice.created_at.strftime("%d.%m.%Y") %>) — tamamlamak için tıklayın
+        </li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<div class="row g-4">
+  <div class="col-md-7">
+    <h2 class="h5 mb-3">Alış Faturaları</h2>
+    <p class="text-muted small">Ürünleri görmek için bir faturaya tıklayın.</p>
+    <table class="table table-sm table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Fatura No</th>
+          <th>Tarih</th>
+          <th class="text-end">Kalem Sayısı</th>
+          <th class="text-end">Toplam Tutar</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @purchase_invoices.each do |invoice| %>
+          <tr>
+            <td><%= link_to invoice.invoice_number, items_purchase_invoice_path(invoice) %></td>
+            <td><%= invoice.invoice_date.strftime("%d.%m.%Y") %></td>
+            <td class="text-end"><%= invoice.purchase_invoice_lines.size %></td>
+            <td class="text-end"><%= number_with_delimiter(invoice.purchase_invoice_lines.sum(&:total_with_vat).round(2)) %> ₺</td>
+            <td class="text-end"><%= link_to "Görüntüle", items_purchase_invoice_path(invoice), class: "btn btn-sm btn-outline-secondary" %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="col-md-5">
+    <h2 class="h5 mb-3">Ödemeler</h2>
+
+    <% if policy(SupplierPayment).create? %>
+      
+      <!-- 1. YENİ: PDF İLE OTOMATİK OKUMA KUTUSU -->
+      <div class="card mb-4 border-primary">
+        <div class="card-body">
+          <h6 class="text-primary mb-2"><i class="bi bi-file-earmark-pdf"></i> PDF Dekonttan Otomatik Oku</h6>
+          
+          <%= form_with url: parse_pdf_supplier_supplier_payments_path(@supplier), multipart: true, data: { turbo: false }, class: "d-flex gap-2" do |f| %>
+            <%= f.file_field :file, class: "form-control form-control-sm", accept: "application/pdf,image/*", required: true %>
+            <%= f.submit "Oku ve Onayla", class: "btn btn-sm btn-primary text-nowrap" %>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- 2. ESKİ: MANUEL EKLEME KUTUSU -->
+      <div class="card mb-3">
+        <div class="card-body">
+          <h6 class="text-muted mb-3">Veya Manuel Ekle</h6>
+          
+          <%= form_with model: @payment, url: supplier_supplier_payments_path(@supplier), class: "row g-2 align-items-end" do |f| %>
+            <div class="col-5">
+              <%= f.label :amount, "Tutar", class: "form-label small" %>
+              <%= f.number_field :amount, step: "any", class: "form-control form-control-sm" %>
+            </div>
+            <div class="col-4">
+              <%= f.label :paid_at, "Tarih", class: "form-label small" %>
+              <%= f.date_field :paid_at, value: Date.current, class: "form-control form-control-sm" %>
+            </div>
+            <div class="col-3">
+              <%= f.submit "Ekle", class: "btn btn-sm btn-success w-100" %>
+            </div>
+            <div class="col-12">
+              <%= f.text_field :note, placeholder: "Not (opsiyonel)", class: "form-control form-control-sm" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <table class="table table-sm table-striped align-middle">
+      <thead>
+        <tr>
+          <th>Tarih</th>
+          <th class="text-end">Tutar</th>
+          <th>Not</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @payments.each do |payment| %>
+          <tr>
+            <td><%= payment.paid_at.strftime("%d.%m.%Y") %></td>
+            <td class="text-end"><%= number_with_delimiter(payment.amount) %> ₺</td>
+            <td><%= payment.note %></td>
+            <td class="text-end">
+              <% if policy(payment).destroy? %>
+                <%= button_to "Sil", supplier_supplier_payment_path(@supplier, payment), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } %>
+              <% end %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

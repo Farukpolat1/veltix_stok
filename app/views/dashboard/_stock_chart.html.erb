@@ -1,0 +1,37 @@
+<%
+  chart_height = 110
+  bar_width = 14
+  bar_gap = 6
+  col_width = (bar_width * 2) + bar_gap + 20
+  svg_width = col_width * @stock_chart_days.size
+  max_value = [ @stock_chart_days.flat_map { |d| [ d[:stock_in], d[:stock_out] ] }.max.to_f, 1 ].max
+  in_color = "#10b981"
+  out_color = "#f43f5e"
+%>
+<div class="card h-100">
+  <div class="card-body">
+    <h2 class="h5 mb-3"><i class="bi bi-bar-chart-line text-primary"></i> Son 7 Gün Stok Hareketi</h2>
+
+    <div class="overflow-auto">
+      <svg viewBox="0 0 <%= svg_width %> <%= chart_height + 26 %>" width="100%" height="<%= chart_height + 26 %>" role="img" aria-label="Son 7 gün stok giriş çıkış grafiği" style="min-width: <%= svg_width %>px;">
+        <% @stock_chart_days.each_with_index do |day, i| %>
+          <% x = i * col_width %>
+          <% in_h = [ (day[:stock_in] / max_value * chart_height).round(1), day[:stock_in].positive? ? 4 : 0 ].max %>
+          <% out_h = [ (day[:stock_out] / max_value * chart_height).round(1), day[:stock_out].positive? ? 4 : 0 ].max %>
+          <rect x="<%= x %>" y="<%= chart_height - in_h %>" width="<%= bar_width %>" height="<%= in_h %>" rx="<%= bar_width / 2.0 %>" fill="<%= in_color %>">
+            <title>Giriş: <%= day[:stock_in] %></title>
+          </rect>
+          <rect x="<%= x + bar_width + bar_gap %>" y="<%= chart_height - out_h %>" width="<%= bar_width %>" height="<%= out_h %>" rx="<%= bar_width / 2.0 %>" fill="<%= out_color %>">
+            <title>Çıkış: <%= day[:stock_out] %></title>
+          </rect>
+          <text x="<%= x + bar_width + (bar_gap / 2.0) %>" y="<%= chart_height + 18 %>" text-anchor="middle" font-size="11" fill="currentColor" class="text-body-secondary"><%= day[:label] %></text>
+        <% end %>
+      </svg>
+    </div>
+
+    <div class="d-flex gap-3 mt-2 small text-body-secondary">
+      <span><span class="d-inline-block rounded-circle me-1" style="width:.6rem;height:.6rem;background:<%= in_color %>;"></span> Giriş</span>
+      <span><span class="d-inline-block rounded-circle me-1" style="width:.6rem;height:.6rem;background:<%= out_color %>;"></span> Çıkış</span>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,10 @@
+<p>Web sitesinden yeni bir demo talebi geldi:</p>
+<ul>
+  <li><strong>Ad Soyad:</strong> <%= @demo_request.name %></li>
+  <li><strong>Firma:</strong> <%= @demo_request.company_name.presence || "—" %></li>
+  <li><strong>E-posta:</strong> <%= @demo_request.email %></li>
+  <li><strong>Telefon:</strong> <%= @demo_request.phone.presence || "—" %></li>
+</ul>
+<% if @demo_request.message.present? %>
+  <p><strong>Mesaj:</strong><br><%= simple_format(@demo_request.message) %></p>
+<% end %>

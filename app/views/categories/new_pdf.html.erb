@@ -1,0 +1,33 @@
+<% content_for :title, "PDF'ten Kategori/Ürün Oluştur" %>
+
+<div class="d-flex justify-content-between align-items-start mb-2">
+  <h1 class="h3 mb-1">PDF'ten Kategori/Ürün Oluştur</h1>
+  <%= link_to categories_path, class: "btn btn-outline-secondary btn-sm" do %><i class="bi bi-arrow-left"></i> Kategorilere Dön<% end %>
+</div>
+<p class="text-muted">
+  Tedarikçinin ürün kataloğu/fiyat listesi PDF'ini yükleyin — yapay zeka ürünleri okuyup
+  uygun kategoriler altında otomatik oluşturur. Stok miktarları 0 olarak başlar,
+  gerçek sayıları Mal Kabul veya Stok Sayımı ile ayrıca girmeniz gerekir.
+</p>
+
+<% if @category.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @category.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with url: new_pdf_categories_path, method: :post, scope: :category, multipart: true, class: "row g-3" do |f| %>
+  <div class="col-12">
+    <%= f.label :pdf_file, "Katalog/Fiyat Listesi PDF Dosyası", class: "form-label" %>
+    <%= f.file_field :pdf_file, class: "form-control", accept: ".pdf" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "PDF'ten Oku ve Oluştur", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", categories_path, class: "btn btn-link" %>
+  </div>
+<% end %>

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <%= render "layouts/head" %>
+
+  <body>
+    <div class="app-main">
+      <% if authenticated? %>
+        <%= render "shared/navbar" %>
+        <%= render "shared/support_request_modal" %>
+      <% end %>
+
+      <% if impersonating? %>
+        <div class="impersonation-bar">
+          <div class="container d-flex align-items-center justify-content-between flex-wrap gap-2">
+            <span><i class="bi bi-incognito"></i> Şu an <strong><%= current_company&.name %></strong> firmasının verilerini görüntülüyorsunuz.</span>
+            <%= button_to "Kendi Firmama Dön", stop_impersonating_companies_path, method: :delete, class: "btn btn-sm btn-dark" %>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="container app-content">
+        <% if notice %>
+          <div class="alert alert-success"><%= notice %></div>
+        <% end %>
+        <% if alert %>
+          <div class="alert alert-danger"><%= alert %></div>
+        <% end %>
+
+        <%= yield %>
+      </div>
+    </div>
+  </body>
+</html>

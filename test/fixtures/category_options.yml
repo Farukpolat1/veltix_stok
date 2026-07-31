@@ -1,0 +1,15 @@
+brand_one:
+  category_option_group: brand
+  name: Egepen
+
+color_one:
+  category_option_group: color
+  name: Beyaz
+
+accessory_type_one:
+  category_option_group: accessory_type
+  name: Kollar
+
+series_one:
+  category_option_group: series
+  name: 70 Serisi

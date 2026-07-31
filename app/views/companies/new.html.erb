@@ -1,0 +1,76 @@
+<% content_for :title, "Yeni Firma Ekle" %>
+
+<span class="flow-badge flow-badge--purchase mb-2"><i class="bi bi-buildings"></i> Platform</span>
+<h1 class="h3 mb-1">Yeni Firma Ekle</h1>
+<p class="text-muted">Firma bilgilerini ve ilk yönetici kullanıcısını girin — kaydettiğinizde firma, varsayılan kategori/marka/renk listeleriyle birlikte hazır olur.</p>
+
+<% if @company.errors.any? || @admin.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @company.errors.full_messages.each { |message| %><li><%= message %></li><% } %>
+      <% @admin.errors.full_messages.each { |message| %><li><%= message %></li><% } %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with url: companies_path, method: :post, class: "row g-3" do %>
+  <div class="col-12">
+    <h2 class="h5 mb-0">Firma Bilgileri</h2>
+  </div>
+
+  <div class="col-md-8">
+    <label class="form-label">Firma Adı</label>
+    <%= text_field_tag "company[name]", @company.name, id: nil, required: true, class: "form-control" %>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label">Telefon</label>
+    <%= text_field_tag "company[phone]", @company.phone, id: nil, class: "form-control" %>
+  </div>
+  <div class="col-12">
+    <label class="form-label">Adres</label>
+    <%= text_area_tag "company[address]", @company.address, id: nil, rows: 2, class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">VKN (opsiyonel)</label>
+    <%= text_field_tag "company[tax_number]", @company.tax_number, id: nil, class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Vergi Dairesi (opsiyonel)</label>
+    <%= text_field_tag "company[tax_office]", @company.tax_office, id: nil, class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Web Sitesi (opsiyonel)</label>
+    <%= text_field_tag "company[website]", @company.website, id: nil, class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">E-posta (opsiyonel)</label>
+    <%= text_field_tag "company[email]", @company.email, id: nil, class: "form-control" %>
+  </div>
+
+  <div class="col-12 mt-4">
+    <h2 class="h5 mb-0">İlk Yönetici Kullanıcı</h2>
+    <p class="text-muted small mb-0">Bu kişi firmanın ilk admin'i olur, kendi Firma Ayarları'ndan logo/adres girebilir ve diğer kullanıcıları ekleyebilir.</p>
+  </div>
+
+  <div class="col-md-6">
+    <label class="form-label">Ad Soyad</label>
+    <%= text_field_tag "admin[name]", @admin.name, id: nil, class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">E-posta</label>
+    <%= email_field_tag "admin[email_address]", @admin.email_address, id: nil, required: true, class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Şifre</label>
+    <%= password_field_tag "admin[password]", nil, id: nil, required: true, autocomplete: "new-password", class: "form-control" %>
+  </div>
+  <div class="col-md-6">
+    <label class="form-label">Şifre (Tekrar)</label>
+    <%= password_field_tag "admin[password_confirmation]", nil, id: nil, autocomplete: "new-password", class: "form-control" %>
+  </div>
+
+  <div class="col-12 mt-3">
+    <%= submit_tag "Firmayı Oluştur", class: "btn btn-primary btn-lg" %>
+    <%= link_to "Vazgeç", companies_path, class: "btn btn-link" %>
+  </div>
+<% end %>

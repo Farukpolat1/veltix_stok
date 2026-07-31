@@ -1,0 +1,57 @@
+<div class="card mb-4" data-controller="product-category-filter" data-product-category-filter-products-value="<%= products.map { |p| { name: p.name, categoryId: p.category_id } }.to_json %>">
+  <div class="card-body">
+    <h2 class="h5 mb-3">Ürün Ekle</h2>
+
+    <div class="mb-3">
+      <label class="form-label small text-muted mb-1">Kategoriye göre daralt (ürün adı önerilerini filtreler)</label>
+      <div class="d-flex flex-wrap gap-3">
+        <% categories.each do |category| %>
+          <div class="form-check form-check-inline mb-0">
+            <%= check_box_tag "category_filter_#{param_key}_#{category.id}", category.id, false, class: "form-check-input", data: { category_id: category.id, "product-category-filter-target": "checkbox", action: "change->product-category-filter#applyFilter" } %>
+            <%= label_tag "category_filter_#{param_key}_#{category.id}", category.name, class: "form-check-label small" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%= form_with url: url, method: :post, scope: :"#{param_key}", class: "row g-3 align-items-end" do |f| %>
+      <div class="col-12 col-md-3">
+        <%= f.label :product_name, "Ürün Adı", class: "form-label" %>
+        <%= f.text_field :product_name, list: "products-datalist-#{param_key}", autocomplete: "off", required: true, placeholder: "Yazın veya listeden seçin", class: "form-control form-control-lg" %>
+        <datalist id="products-datalist-<%= param_key %>" data-product-category-filter-target="datalist">
+          <% products.each do |product| %>
+            <option value="<%= product.name %>"></option>
+          <% end %>
+        </datalist>
+        <div class="form-text">Mevcut ürün adıyla birebir eşleşirse o ürün kullanılır; eşleşmezse yeni ürün olarak eklenir.</div>
+      </div>
+      <div class="col-6 col-md-2">
+        <%= f.label :product_code, "Stok Kodu (yeni ürünse, opsiyonel)", class: "form-label" %>
+        <%= f.text_field :product_code, placeholder: "Boşsa otomatik", class: "form-control form-control-lg" %>
+      </div>
+      <div class="col-6 col-md-2">
+        <%= f.label :category_id, "Kategori (yeni ürünse)", class: "form-label" %>
+        <%= f.collection_select :category_id, categories, :id, :name, { include_blank: "—" }, class: "form-select form-select-lg" %>
+      </div>
+      <div class="col-6 col-md-1">
+        <%= f.label :unit, "Birim", class: "form-label" %>
+        <%= f.select :unit, Product::UNIT_LABELS.map { |value, label| [ label, value ] }, { include_blank: "—" }, class: "form-select form-select-lg" %>
+      </div>
+      <div class="col-6 col-md-1">
+        <%= f.label :quantity, "Miktar", class: "form-label" %>
+        <%= f.number_field :quantity, step: "any", min: 0, required: true, class: "form-control form-control-lg" %>
+      </div>
+      <div class="col-6 col-md-1">
+        <%= f.label :unit_price, "Fiyat", class: "form-label" %>
+        <%= f.number_field :unit_price, step: "any", min: 0, value: 0, class: "form-control form-control-lg" %>
+      </div>
+      <div class="col-6 col-md-1">
+        <%= f.label :vat_rate, "KDV %", class: "form-label" %>
+        <%= f.select :vat_rate, [ 0, 1, 10, 20 ], { selected: 20 }, class: "form-select form-select-lg" %>
+      </div>
+      <div class="col-12 col-md-1">
+        <%= f.submit "Ekle", class: "btn btn-success btn-lg w-100" %>
+      </div>
+    <% end %>
+  </div>
+</div>

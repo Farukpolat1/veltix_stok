@@ -1,0 +1,29 @@
+<% content_for :title, "Şifre Güncelle" %>
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-4 text-center">Şifreni Güncelle</h1>
+
+        <% if flash[:alert] %>
+          <div class="alert alert-danger"><%= flash[:alert] %></div>
+        <% end %>
+
+        <%= form_with url: password_path(params[:token]), method: :put, class: "row g-3" do |form| %>
+          <div class="col-12">
+            <%= form.label :password, "Yeni Şifre", class: "form-label" %>
+            <%= form.password_field :password, required: true, autocomplete: "new-password", maxlength: 72, class: "form-control" %>
+          </div>
+          <div class="col-12">
+            <%= form.label :password_confirmation, "Yeni Şifre (Tekrar)", class: "form-label" %>
+            <%= form.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72, class: "form-control" %>
+          </div>
+          <div class="col-12">
+            <%= form.submit "Kaydet", class: "btn btn-primary w-100" %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

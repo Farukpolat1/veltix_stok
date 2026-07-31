@@ -1,0 +1,31 @@
+<% content_for :title, "Onay E-postasını Yeniden Gönder" %>
+
+<div class="row justify-content-center">
+  <div class="col-md-7 col-lg-5">
+    <div class="landing-login-card card border-0 shadow-lg">
+      <div class="landing-login-card__accent"></div>
+      <div class="card-body p-4 p-lg-5">
+        <h1 class="h4 mb-1 text-center">Onay E-postasını Yeniden Gönder</h1>
+        <p class="text-muted small mb-4 text-center">Hesabınızı henüz onaylamadıysanız, onay bağlantısını tekrar gönderelim.</p>
+
+        <% if flash[:alert] %>
+          <div class="alert alert-danger"><%= flash[:alert] %></div>
+        <% end %>
+
+        <%= form_with url: confirmations_path, class: "row g-3" do |form| %>
+          <div class="col-12">
+            <%= form.label :email_address, "E-posta", class: "form-label" %>
+            <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "form-control form-control-lg" %>
+          </div>
+          <div class="col-12 mt-4">
+            <%= form.submit "Onay Bağlantısını Gönder", class: "btn btn-primary btn-lg w-100" %>
+          </div>
+        <% end %>
+
+        <div class="text-center mt-3">
+          <%= link_to "Girişe dön", new_session_path, class: "small" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,39 @@
+<%# Veltix platform markası — Antrasit'ten Elektrik İndigo'ya geçen, ileriye
+    doğru ivmelenen (asimetrik, hız çizgili) geometrik bir "V"; sağ bacağın
+    içine barkod çizgisi detayı işlenmiş (lojistik/stok referansı). Firmaya
+    özel bir logo yoksa (bkz. company_logo?) hem giriş ekranında hem de
+    navbar/footer'da bu genel platform markası gösterilir. %>
+<% size ||= 40 %>
+<% uid = SecureRandom.hex(4) %>
+<svg width="<%= size %>" height="<%= size %>" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Veltix">
+  <defs>
+    <linearGradient id="veltixGrad-<%= uid %>" x1="10%" y1="0%" x2="95%" y2="100%">
+      <stop offset="0%" stop-color="#2a2e35"/>
+      <stop offset="45%" stop-color="#3b3fa0"/>
+      <stop offset="100%" stop-color="#4f46e5"/>
+    </linearGradient>
+    <clipPath id="veltixClip-<%= uid %>">
+      <polygon points="116,4 96,4 63,100 83,100"/>
+    </clipPath>
+  </defs>
+
+  <g stroke="#4f46e5" stroke-width="2.5" stroke-linecap="round" opacity="0.35">
+    <line x1="2" y1="34" x2="16" y2="26"/>
+    <line x1="2" y1="44" x2="20" y2="36"/>
+    <line x1="4" y1="54" x2="24" y2="46"/>
+  </g>
+
+  <polygon points="10,4 32,4 61,100 41,100" fill="url(#veltixGrad-<%= uid %>)"/>
+  <polygon points="116,4 96,4 63,100 83,100" fill="url(#veltixGrad-<%= uid %>)"/>
+
+  <g clip-path="url(#veltixClip-<%= uid %>)">
+    <g fill="#eef1f6" opacity="0.92" transform="translate(70,52) rotate(-20)">
+      <rect x="0" y="0" width="3" height="30"/>
+      <rect x="6" y="0" width="1.4" height="30"/>
+      <rect x="10" y="0" width="4" height="30"/>
+      <rect x="17" y="0" width="2" height="30"/>
+      <rect x="22" y="0" width="1.4" height="30"/>
+      <rect x="26" y="0" width="3" height="30"/>
+    </g>
+  </g>
+</svg>

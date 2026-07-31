@@ -1,0 +1,122 @@
+<% content_for :title, "Stok Hareketleri" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="h3 mb-0">Stok Hareketleri</h1>
+  <%= render "shared/export_menu",
+        csv_path: export_csv_stock_movements_path(q: params[:q], direction: params[:direction], from: params[:from], to: params[:to]),
+        pdf_path: export_pdf_stock_movements_path(q: params[:q], direction: params[:direction], from: params[:from], to: params[:to]) %>
+</div>
+
+<div class="row row-cols-1 row-cols-md-3 g-3 mb-3">
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="stat-card__icon"><i class="bi bi-arrow-left-right"></i></span>
+          <h2 class="h6 text-muted mb-0">Bugünkü Toplam Hareket</h2>
+        </div>
+        <p class="h4 mb-0 text-dark"><%= @today_movement_count %> İşlem</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="stat-card__icon stat-card__icon--success"><i class="bi bi-arrow-down-circle"></i></span>
+          <h2 class="h6 text-muted mb-0">Giren Stok Miktarı</h2>
+        </div>
+        <p class="h4 mb-0 text-success">+<%= number_with_delimiter(@today_stock_in) %> Adet</p>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="stat-card__icon stat-card__icon--warning"><i class="bi bi-arrow-up-circle"></i></span>
+          <h2 class="h6 text-muted mb-0">Çıkan Stok Miktarı</h2>
+        </div>
+        <p class="h4 mb-0 text-danger">-<%= number_with_delimiter(@today_stock_out) %> Adet</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+  <div class="filter-tabs">
+    <%= link_to request.query_parameters.except(:direction, :page), class: "filter-tabs__link #{"active" if params[:direction].blank?}" do %>
+      Tüm Hareketler <span class="text-muted">(<%= @direction_counts.values.sum %>)</span>
+    <% end %>
+    <%= link_to request.query_parameters.merge(direction: "in").except(:page), class: "filter-tabs__link #{"active" if params[:direction] == "in"}" do %>
+      <i class="bi bi-arrow-down-circle text-success"></i> Mal Kabul (Giriş) <span class="text-muted">(<%= @direction_counts["in"] || 0 %>)</span>
+    <% end %>
+    <%= link_to request.query_parameters.merge(direction: "out").except(:page), class: "filter-tabs__link #{"active" if params[:direction] == "out"}" do %>
+      <i class="bi bi-arrow-up-circle text-danger"></i> Sevkiyat (Çıkış) <span class="text-muted">(<%= @direction_counts["out"] || 0 %>)</span>
+    <% end %>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: stock_movements_path, method: :get, class: "row g-2 align-items-end", data: { controller: "auto-submit" } do %>
+      <% if params[:direction].present? %><%= hidden_field_tag :direction, params[:direction] %><% end %>
+      <div class="col-md-4">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Ürün adı ara...", data: { action: "input->auto-submit#submit" } %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :from, "Başlangıç", class: "form-label mb-1" %>
+        <%= date_field_tag :from, params[:from], class: "form-control", data: { action: "change->auto-submit#submitNow" } %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :to, "Bitiş", class: "form-label mb-1" %>
+        <%= date_field_tag :to, params[:to], class: "form-control", data: { action: "change->auto-submit#submitNow" } %>
+      </div>
+      <div class="col-auto">
+        <% if params[:q].present? || params[:from].present? || params[:to].present? %>
+          <%= link_to stock_movements_path(direction: params[:direction]), class: "btn btn-outline-secondary", title: "Filtreleri Sıfırla" do %><i class="bi bi-x-lg"></i><% end %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<p class="text-muted small"><%= @total_count %> hareket bulundu.</p>
+
+<table class="table table-flat align-middle">
+  <thead>
+    <tr>
+      <th>Tarih</th>
+      <th>Ürün</th>
+      <th>Yön</th>
+      <th class="text-end">Miktar</th>
+      <th>Kaynak</th>
+      <th>Kullanıcı</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stock_movements.each do |movement| %>
+      <tr>
+        <td><%= movement.occurred_at.strftime("%d.%m.%Y %H:%M") %></td>
+        <td><%= movement.product.name %></td>
+        <td>
+          <span class="badge <%= movement.in? ? "badge-soft-success" : "badge-soft-danger" %>">
+            <i class="bi <%= movement.in? ? "bi-arrow-down" : "bi-arrow-up" %>"></i>
+            <%= movement.in? ? "Giriş" : "Çıkış" %>
+          </span>
+        </td>
+        <td class="text-end"><%= movement.quantity %></td>
+        <td><%= stock_movement_source_link(movement) %></td>
+        <td>
+          <div class="d-flex align-items-center gap-2">
+            <span class="avatar-circle avatar-circle--sm"><%= initials_for(movement.user.display_name) %></span>
+            <%= movement.user.display_name %>
+          </div>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

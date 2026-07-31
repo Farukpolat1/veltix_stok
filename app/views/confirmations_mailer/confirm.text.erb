@@ -1,0 +1,6 @@
+Merhaba <%= @user.display_name %>,
+
+<%= Veltix::PLATFORM_NAME %> hesabınızı aktifleştirmek için şu adrese gidin:
+<%= confirmation_url(@user.generate_token_for(:email_confirmation)) %>
+
+Bu bağlantı 48 saat içinde geçerliliğini yitirecek.

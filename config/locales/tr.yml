@@ -1,0 +1,137 @@
+tr:
+  activerecord:
+    errors:
+      messages:
+        blank: "boş bırakılamaz"
+        taken: "zaten kullanılıyor"
+        invalid: "geçerli değil"
+        not_a_number: "sayı olmalıdır"
+        greater_than: "%{count} değerinden büyük olmalıdır"
+        greater_than_or_equal_to: "%{count} değerinden büyük veya eşit olmalıdır"
+        less_than: "%{count} değerinden küçük olmalıdır"
+        less_than_or_equal_to: "%{count} değerinden küçük veya eşit olmalıdır"
+        confirmation: "eşleşmiyor"
+        too_short: "en az %{count} karakter olmalıdır"
+        too_long: "en fazla %{count} karakter olmalıdır"
+        record_invalid: "Doğrulama başarısız: %{errors}"
+    attributes:
+      product:
+        name: "Ad"
+        code: "Kod"
+        category: "Kategori"
+        unit: "Birim"
+        stock_quantity: "Stok"
+        min_stock_level: "Min. Stok"
+      supplier:
+        name: "Ad"
+        tax_number: "VKN/TCKN"
+        tax_office: "Vergi Dairesi"
+        phone: "Telefon"
+        address: "Adres"
+        code: "Kod"
+        opening_balance: "Devir Bakiyesi"
+      customer:
+        name: "Ad"
+        phone: "Telefon"
+        address: "Adres"
+        il: "İl"
+        tax_number: "VKN/TCKN"
+        tax_office: "Vergi Dairesi"
+        code: "Kod"
+        opening_balance: "Devir Bakiyesi"
+      category:
+        name: "Ad"
+        code: "Kod"
+        color: "Renk"
+        accessory_type: "Alt Tür"
+        brand: "Marka"
+        series: "Seri"
+        product_type: "Çeşit"
+      category_option:
+        name: "Ad"
+        category_option_group: "Grup"
+      category_option_group:
+        name: "Ad"
+      company:
+        name: "Firma Adı"
+        slogan: "Slogan"
+        address: "Adres"
+        phone: "Telefon"
+        website: "Web Sitesi"
+        email: "E-posta"
+        tax_number: "VKN"
+        tax_office: "Vergi Dairesi"
+      user:
+        name: "Ad Soyad"
+        email_address: "E-posta"
+        password: "Şifre"
+        password_confirmation: "Şifre (Tekrar)"
+        role: "Rol"
+      purchase_invoice:
+        invoice_number: "Fatura No"
+        invoice_date: "Fatura Tarihi"
+        supplier: "Tedarikçi"
+      purchase_invoice_line:
+        quantity: "Miktar"
+        unit_price: "Birim Fiyat"
+        vat_rate: "KDV Oranı"
+        external_code: "Ürün Kodu"
+        external_name: "Ürün Adı"
+      sale:
+        sale_number: "Satış No"
+        sale_date: "Satış Tarihi"
+        customer: "Müşteri"
+        external_order_number: "Sipariş No"
+      sale_line:
+        quantity: "Miktar"
+        unit_price: "Birim Fiyat"
+        vat_rate: "KDV Oranı"
+      stock_adjustment:
+        product: "Ürün"
+        quantity_before: "Önceki Miktar"
+        quantity_after: "Sonraki Miktar"
+        reason: "Sebep"
+      stock_movement:
+        quantity: "Miktar"
+        occurred_at: "Tarih"
+      customer_payment:
+        amount: "Tutar"
+        paid_at: "Ödeme Tarihi"
+      supplier_payment:
+        amount: "Tutar"
+        paid_at: "Ödeme Tarihi"
+      supplier_product_mapping:
+        external_code: "Tedarikçi Ürün Kodu"
+  # DemoRequest/SupportRequest gibi ActiveRecord olmayan (ActiveModel::Model)
+  # form nesneleri hata mesajı ararken activerecord: değil, activemodel: veya
+  # en sonunda üstteki genel errors: anahtarına bakar — bu yüzden aynı mesajlar
+  # burada da tekrarlanıyor (bkz. errors.messages altında).
+  activemodel:
+    attributes:
+      demo_request:
+        name: "Ad Soyad"
+        email: "E-posta"
+      support_request:
+        subject: "Konu"
+        message: "Mesaj"
+  errors:
+    format: "%{attribute} %{message}"
+    messages:
+      blank: "boş bırakılamaz"
+      taken: "zaten kullanılıyor"
+      invalid: "geçerli değil"
+      not_a_number: "sayı olmalıdır"
+      greater_than: "%{count} değerinden büyük olmalıdır"
+      greater_than_or_equal_to: "%{count} değerinden büyük veya eşit olmalıdır"
+      less_than: "%{count} değerinden küçük olmalıdır"
+      less_than_or_equal_to: "%{count} değerinden küçük veya eşit olmalıdır"
+      confirmation: "eşleşmiyor"
+      too_short: "en az %{count} karakter olmalıdır"
+      too_long: "en fazla %{count} karakter olmalıdır"
+      record_invalid: "Doğrulama başarısız: %{errors}"
+  date:
+    formats:
+      default: "%d.%m.%Y"
+  time:
+    formats:
+      default: "%d.%m.%Y %H:%M"

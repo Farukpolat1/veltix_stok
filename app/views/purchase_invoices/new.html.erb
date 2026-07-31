@@ -1,0 +1,25 @@
+<% content_for :title, "Fatura İçe Aktar" %>
+
+<h1 class="h3 mb-3">e-Fatura/e-Arşiv XML İçe Aktar</h1>
+
+<% if @purchase_invoice.errors.any? %>
+  <div class="alert alert-danger">
+    <ul class="mb-0">
+      <% @purchase_invoice.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>
+
+<%= form_with url: purchase_invoices_path, method: :post, scope: :purchase_invoice, multipart: true, class: "row g-3" do |f| %>
+  <div class="col-12">
+    <%= f.label :ubl_file, "e-Fatura/e-Arşiv XML Dosyası (UBL-TR)", class: "form-label" %>
+    <%= f.file_field :ubl_file, class: "form-control", accept: ".xml" %>
+  </div>
+
+  <div class="col-12">
+    <%= f.submit "İçe Aktar", class: "btn btn-primary" %>
+    <%= link_to "Vazgeç", purchase_invoices_path, class: "btn btn-link" %>
+  </div>
+<% end %>

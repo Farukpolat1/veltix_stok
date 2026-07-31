@@ -1,0 +1,20 @@
+test:
+  service: Disk
+  root: <%= Rails.root.join("tmp/storage") %>
+
+local:
+  service: Disk
+  root: <%= Rails.root.join("storage") %>
+
+# Production — GEMINI_API_KEY/RESEND_API_KEY gibi diğer tüm sırlar da ENV
+# üzerinden geliyor (bkz. .env.example, config/deploy.yml), bu yüzden
+# Rails credentials yerine ENV kullanılıyor; Kamal'da tek yerden yönetilir.
+# Cloudflare R2 veya Backblaze B2 gibi S3 uyumlu bir servis kullanıyorsanız
+# AWS_ENDPOINT ekleyip bu bloğa `endpoint: <%= ENV["AWS_ENDPOINT"] %>` satırı
+# eklemeniz yeterli — gerisi aynı kalır.
+amazon:
+  service: S3
+  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("AWS_REGION", "eu-central-1") %>
+  bucket: <%= ENV["AWS_BUCKET"] %>

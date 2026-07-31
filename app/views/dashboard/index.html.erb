@@ -1,0 +1,94 @@
+<% content_for :title, "Anasayfa" %>
+
+<div class="hero-panel hero-panel--compact">
+  <div class="hero-panel__body">
+    <%= render "shared/brand_mark" %>
+    <span class="flow-badge flow-badge--purchase mb-2"><i class="bi bi-speedometer2"></i> Yönetim</span>
+    <h1 class="h3 mb-1">Hoş geldin, <%= current_user.display_name %></h1>
+    <p class="mb-3">İşletmenin genel durumu</p>
+
+    <div class="d-flex flex-wrap gap-2">
+      <%= link_to sales_path, class: "glance-pill" do %>
+        <i class="bi bi-cart-check"></i> Bugün Satış <span class="badge bg-light text-dark rounded-pill"><%= @today_sale_count %></span>
+      <% end %>
+      <%= link_to sales_path, class: "glance-pill" do %>
+        <i class="bi bi-hourglass-split"></i> Bekleyen Satış <span class="badge bg-light text-dark rounded-pill"><%= @pending_sales_count %></span>
+      <% end %>
+      <%= link_to purchase_invoices_path, class: "glance-pill" do %>
+        <i class="bi bi-truck"></i> Bekleyen Fatura <span class="badge bg-light text-dark rounded-pill"><%= @pending_purchase_invoices_count %></span>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="mb-4">
+  <%= render "stock_query" %>
+</div>
+
+<div class="row row-cols-2 row-cols-md-4 g-3 mb-4">
+  <div class="col">
+    <div class="card stat-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <span class="stat-card__icon stat-card__icon--success"><i class="bi bi-cash-coin"></i></span>
+          <h2 class="h6 text-muted mb-0">Günlük Ciro</h2>
+        </div>
+        <p class="h4 mb-0 text-dark"><%= number_with_delimiter(@today_revenue.round(2)) %> ₺</p>
+        <% if @revenue_trend_percent %>
+          <p class="small mb-0 mt-1 <%= @revenue_trend_percent >= 0 ? "text-success" : "text-danger" %>">
+            <i class="bi <%= @revenue_trend_percent >= 0 ? "bi-arrow-up-right" : "bi-arrow-down-right" %>"></i>
+            %<%= number_with_delimiter(@revenue_trend_percent.abs) %> dünden
+          </p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+  <div class="col">
+    <%= link_to products_path(low_stock: true), class: "text-decoration-none" do %>
+      <div class="card stat-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="stat-card__icon <%= "stat-card__icon--warning" if @low_stock_count.positive? %>"><i class="bi bi-exclamation-triangle"></i></span>
+            <h2 class="h6 text-muted mb-0">Kritik Stoktaki Ürünler</h2>
+          </div>
+          <p class="h4 mb-0 text-dark"><%= @low_stock_count %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col">
+    <%= link_to purchase_invoices_path(status: "pending"), class: "text-decoration-none" do %>
+      <div class="card stat-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="stat-card__icon stat-card__icon--purchase"><i class="bi bi-truck"></i></span>
+            <h2 class="h6 text-muted mb-0">Bekleyen Alış Faturaları</h2>
+          </div>
+          <p class="h4 mb-0 text-dark"><%= @pending_purchase_invoices_count %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+  <div class="col">
+    <%= link_to stock_movements_path, class: "text-decoration-none" do %>
+      <div class="card stat-card h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="stat-card__icon stat-card__icon--info"><i class="bi bi-arrow-left-right"></i></span>
+            <h2 class="h6 text-muted mb-0">Aylık Stok Hareketi</h2>
+          </div>
+          <p class="h4 mb-0 text-dark"><%= number_with_delimiter(@monthly_stock_movement_total) %></p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-6">
+    <%= render "low_stock_table" %>
+  </div>
+  <div class="col-lg-6">
+    <%= render "stock_chart" %>
+  </div>
+</div>

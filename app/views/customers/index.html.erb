@@ -1,0 +1,74 @@
+<% content_for :title, "Müşteriler" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <span class="flow-badge flow-badge--sale mb-1"><i class="bi bi-cart-check"></i> Satış tarafı</span>
+    <h1 class="h3 mb-0">Müşteriler</h1>
+  </div>
+  <div class="d-flex gap-2">
+    <%= render "shared/export_menu",
+          csv_path: export_csv_customers_path(q: params[:q], il: params[:il]),
+          pdf_path: export_pdf_customers_path(q: params[:q], il: params[:il]) %>
+    <% if policy(Customer).create? %>
+      <%= link_to "Yeni Müşteri", new_customer_path, class: "btn btn-success" %>
+    <% end %>
+  </div>
+</div>
+
+<%= form_with url: customers_path, method: :get, class: "row g-2 mb-3" do %>
+  <div class="col-md-4">
+    <%= render "shared/search_field", value: params[:q], placeholder: "Müşteri adı ara..." %>
+  </div>
+  <div class="col-md-3">
+    <%= select_tag :il, options_for_select(@ils, params[:il]), include_blank: "Tüm İller", class: "form-select" %>
+  </div>
+  <div class="col-auto">
+    <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+  </div>
+<% end %>
+
+<table class="table table-striped align-middle">
+  <thead>
+    <tr>
+      <th><%= sortable_header :code, "Cari Kodu" %></th>
+      <th><%= sortable_header :name, "Müşteri Adı" %></th>
+      <th><%= sortable_header :il, "İl" %></th>
+      <th class="text-end">Bakiye</th>
+      <th class="text-end">İşlemler</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @customers.each do |customer| %>
+      <tr>
+        <td><%= customer.code %></td>
+        <td>
+          <%= link_to customer.name, customer_path(customer), class: "link-dark text-decoration-none fw-semibold" %>
+          <% if customer.phone.present? %>
+            <br><span class="text-muted small"><i class="bi bi-telephone"></i> <%= customer.phone %></span>
+          <% end %>
+        </td>
+        <td><%= customer.il %></td>
+        <% balance = @balances[customer.id] %>
+        <td class="text-end">
+          <span class="badge <%= balance.positive? ? "badge-soft-success" : (balance.negative? ? "badge-soft-danger" : "bg-light text-muted") %>">
+            <%= number_with_delimiter(balance.round(2)) %> ₺
+          </span>
+        </td>
+        <td class="text-end">
+          <%= render layout: "shared/actions_menu" do %>
+            <li><%= link_to customer_path(customer), class: "dropdown-item" do %><i class="bi bi-wallet2"></i> Cari Hesap<% end %></li>
+            <li><%= link_to statement_customer_path(customer), target: "_blank", class: "dropdown-item" do %><i class="bi bi-file-earmark-pdf"></i> PDF Oluştur<% end %></li>
+            <% if policy(customer).update? %>
+              <li><%= link_to edit_customer_path(customer), class: "dropdown-item" do %><i class="bi bi-pencil"></i> Düzenle<% end %></li>
+            <% end %>
+            <% if policy(customer).destroy? %>
+              <li><%= button_to customer_path(customer), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+            <% end %>
+          <% end %>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

@@ -1,0 +1,66 @@
+<% content_for :title, "Çözümler" %>
+
+<span class="section-eyebrow mb-3 d-inline-flex"><i class="bi bi-signpost-split"></i> Çözümler</span>
+<h1 class="h3 mb-3">İşletme tipinize göre çözüm</h1>
+<p class="lead text-muted mb-4">
+  <%= Veltix::PLATFORM_NAME %>, aynı altyapıyı farklı işletme tiplerinin
+  ihtiyaçlarına göre kullanmanızı sağlar.
+</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="stat-card__icon"><i class="bi bi-layers"></i></span>
+          <h2 class="h6 mb-0">PVC Profil Üreticileri</h2>
+        </div>
+        <p class="text-muted small mb-0">
+          Seri, renk ve marka bazında profil stoğunuzu takip edin; kesim/boy
+          bazlı ürün kartlarıyla tedarikçiden gelen faturaları yapay zeka ile
+          otomatik işleyip stoğa yansıtın.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="stat-card__icon"><i class="bi bi-truck"></i></span>
+          <h2 class="h6 mb-0">Kapı &amp; Pencere Distribütörleri</h2>
+        </div>
+        <p class="text-muted small mb-0">
+          Çok sayıda müşteri ve tedarikçiyle çalışan distribütörler için cari
+          hesap takibi, satış/alış onay akışı ve irsaliye/fatura PDF
+          çıktısı tek ekranda.
+        </p>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="card h-100">
+      <div class="card-body p-4">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <span class="stat-card__icon"><i class="bi bi-building-gear"></i></span>
+          <h2 class="h6 mb-0">Çoklu Depo/Şube İşletmeleri</h2>
+        </div>
+        <p class="text-muted small mb-0">
+          Birden fazla kullanıcının aynı anda çalıştığı işletmelerde rol
+          bazlı yetkilendirme (yönetici, depo, satış) ile herkes yalnızca
+          kendi işini görür.
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 landing-cta-card mb-4">
+  <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+      <h2 class="h5 mb-1 text-white">Sizin işletmenize uyar mı?</h2>
+      <p class="mb-0 text-white-50">İşletmenizin özel ihtiyaçlarını birlikte konuşalım.</p>
+    </div>
+    <%= link_to "Demo Talep Edin", new_demo_request_path, class: "btn btn-light btn-lg text-nowrap" %>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<% content_for :title, "Profilim" %>
+
+<span class="section-eyebrow mb-2 d-inline-flex"><i class="bi bi-person-circle"></i> Hesabım</span>
+<h1 class="h3 mb-3">Profilim</h1>
+
+<div class="card">
+  <div class="card-body p-4">
+    <% if @user.errors.any? %>
+      <div class="alert alert-danger">
+        <ul class="mb-0">
+          <% @user.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <%= form_with model: @user, url: profile_path, method: :patch, class: "row g-3" do |f| %>
+      <div class="col-md-6">
+        <%= label_tag :company, "Firma", class: "form-label" %>
+        <%= text_field_tag :company, current_company&.name || "—", class: "form-control", disabled: true %>
+      </div>
+      <div class="col-md-6">
+        <%= label_tag :role, "Rol", class: "form-label" %>
+        <%= text_field_tag :role, { "admin" => "Admin", "depo" => "Depo", "satis" => "Satış" }[current_user.role], class: "form-control", disabled: true %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :name, "Ad Soyad", class: "form-label" %>
+        <%= f.text_field :name, class: "form-control" %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :email_address, "E-posta", class: "form-label" %>
+        <%= f.email_field :email_address, class: "form-control" %>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :password, "Yeni Şifre", class: "form-label" %>
+        <%= f.password_field :password, class: "form-control", autocomplete: "new-password" %>
+        <div class="form-text">Değiştirmek istemiyorsan boş bırak.</div>
+      </div>
+      <div class="col-md-6">
+        <%= f.label :password_confirmation, "Yeni Şifre (Tekrar)", class: "form-label" %>
+        <%= f.password_field :password_confirmation, class: "form-control", autocomplete: "new-password" %>
+      </div>
+      <div class="col-12">
+        <%= f.submit "Kaydet", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

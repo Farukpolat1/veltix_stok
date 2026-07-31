@@ -1,0 +1,39 @@
+<% content_for :title, "Ürün Düzenle" %>
+
+<h1 class="h3 mb-3">Ürün Düzenle</h1>
+<%= render "form", product: @product %>
+
+<% if @recent_purchases.any? %>
+  <div class="card mt-4">
+    <div class="card-body">
+      <h2 class="h5 mb-3">Son Alışlar</h2>
+      <p class="text-muted small mb-3">Bu ürün en son hangi tedarikçiden, ne zaman, ne fiyata alınmış — fiyat karşılaştırması için.</p>
+      <table class="table table-sm align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Tedarikçi</th>
+            <th>Tarih</th>
+            <th class="text-end">Miktar</th>
+            <th class="text-end">Birim Fiyat</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @recent_purchases.each do |line| %>
+            <tr class="<%= "table-success" if line == @recent_purchases.first %>">
+              <td>
+                <% if policy(line.purchase_invoice.supplier).show? %>
+                  <%= link_to line.purchase_invoice.supplier.name, supplier_path(line.purchase_invoice.supplier) %>
+                <% else %>
+                  <%= line.purchase_invoice.supplier.name %>
+                <% end %>
+              </td>
+              <td><%= line.purchase_invoice.invoice_date %></td>
+              <td class="text-end"><%= line.quantity %></td>
+              <td class="text-end"><%= number_with_delimiter(line.unit_price) %> ₺</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

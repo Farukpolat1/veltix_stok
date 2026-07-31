@@ -1,0 +1,90 @@
+<% content_for :title, "Tedarikçiler" %>
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <div>
+    <span class="flow-badge flow-badge--purchase mb-1"><i class="bi bi-truck"></i> Alış tarafı</span>
+    <h1 class="h3 mb-0">Tedarikçiler</h1>
+  </div>
+  <div class="d-flex gap-2">
+    <%= render "shared/export_menu",
+          csv_path: export_csv_suppliers_path(q: params[:q], category_id: params[:category_id]),
+          pdf_path: export_pdf_suppliers_path(q: params[:q], category_id: params[:category_id]) %>
+    <% if policy(Supplier).create? %>
+      <%= link_to "Yeni Tedarikçi", new_supplier_path, class: "btn btn-primary" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="card filter-panel mb-3">
+  <div class="card-body">
+    <%= form_with url: suppliers_path, method: :get, class: "row g-2 align-items-end" do %>
+      <div class="col-md-4">
+        <%= label_tag :q, "Ara", class: "form-label mb-1" %>
+        <%= render "shared/search_field", value: params[:q], placeholder: "Firma adı..." %>
+      </div>
+      <div class="col-md-3">
+        <%= label_tag :category_id, "Kategori", class: "form-label mb-1" %>
+        <%= select_tag :category_id, options_for_select(@filter_categories.map { |c| [ c.name, c.id ] }, params[:category_id]), include_blank: "Tüm Kategoriler", class: "form-select" %>
+      </div>
+      <div class="col-auto">
+        <%= submit_tag "Ara", class: "btn btn-outline-primary" %>
+        <% if params[:q].present? || params[:category_id].present? %>
+          <%= link_to "Temizle", suppliers_path, class: "btn btn-link" %>
+        <% end %>
+      </div>
+      <div class="col-auto ms-auto d-flex gap-1">
+        <span class="text-muted small align-self-center me-1">Sırala:</span>
+        <%= sortable_header :name, "Ad" %>
+        <span class="text-muted">·</span>
+        <%= sortable_header :code, "Kod" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="row g-3">
+  <% @suppliers.each do |supplier| %>
+    <div class="col-sm-6 col-lg-4">
+      <div class="card h-100 supplier-card">
+        <div class="card-body d-flex flex-column">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div class="d-flex align-items-center gap-2">
+              <span class="avatar-circle"><%= initials_for(supplier.name) %></span>
+              <div>
+                <h2 class="h6 mb-0"><%= link_to supplier.name, supplier_path(supplier), class: "link-dark text-decoration-none" %></h2>
+                <span class="text-muted small"><%= supplier.code %></span>
+              </div>
+            </div>
+            <%= render layout: "shared/actions_menu" do %>
+              <li><%= link_to statement_supplier_path(supplier), target: "_blank", class: "dropdown-item" do %><i class="bi bi-file-earmark-pdf"></i> Cari Ekstre PDF<% end %></li>
+              <% if policy(supplier).update? %>
+                <li><%= link_to edit_supplier_path(supplier), class: "dropdown-item" do %><i class="bi bi-pencil"></i> Düzenle<% end %></li>
+              <% end %>
+              <% if policy(supplier).destroy? %>
+                <li><%= button_to supplier_path(supplier), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+              <% end %>
+            <% end %>
+          </div>
+
+          <div class="mb-2">
+            <% supplier.categories.each do |category| %>
+              <span class="category-badge me-1 mb-1"><%= category.name %></span>
+            <% end %>
+          </div>
+
+          <p class="text-muted small mb-3"><i class="bi bi-telephone"></i> <%= supplier.phone.presence || "—" %></p>
+
+          <div class="mt-auto">
+            <span class="badge fs-6 px-3 py-2 mb-3 d-inline-block <%= @balances[supplier.id].positive? ? "badge-soft-danger" : "badge-soft-success" %>">
+              <%= number_with_delimiter(@balances[supplier.id].round(2)) %> ₺
+            </span>
+
+            <%= link_to supplier_path(supplier), class: "btn btn-sm btn-outline-primary w-100" do %><i class="bi bi-journal-text"></i> Cari Hesap / İncele<% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%= render "shared/pagination", page: @page, total_pages: @total_pages, total_count: @total_count %>

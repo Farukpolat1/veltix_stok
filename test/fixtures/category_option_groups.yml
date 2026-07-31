@@ -1,0 +1,15 @@
+brand:
+  company: one
+  name: Marka
+
+color:
+  company: one
+  name: Renk
+
+accessory_type:
+  company: one
+  name: Aksesuar Alt Türü
+
+series:
+  company: one
+  name: Seri

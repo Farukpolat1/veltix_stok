@@ -1,0 +1,29 @@
+<% content_for :title, "Şifremi Unuttum" %>
+
+<div class="row justify-content-center mt-5">
+  <div class="col-md-5 col-lg-4">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h1 class="h4 mb-4 text-center">Şifremi Unuttum</h1>
+
+        <% if flash[:alert] %>
+          <div class="alert alert-danger"><%= flash[:alert] %></div>
+        <% end %>
+
+        <%= form_with url: passwords_path, class: "row g-3" do |form| %>
+          <div class="col-12">
+            <%= form.label :email_address, "E-posta", class: "form-label" %>
+            <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", value: params[:email_address], class: "form-control" %>
+          </div>
+          <div class="col-12">
+            <%= form.submit "Sıfırlama Bağlantısı Gönder", class: "btn btn-primary w-100" %>
+          </div>
+        <% end %>
+
+        <div class="text-center mt-3">
+          <%= link_to "Girişe dön", new_session_path, class: "small" %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,85 @@
+<% content_for :title, "Platform" %>
+
+<span class="section-eyebrow mb-3 d-inline-flex"><i class="bi bi-grid-1x2"></i> Platform</span>
+<h1 class="h3 mb-3">Depodan cariye, tek platform</h1>
+<p class="lead text-muted mb-4">
+  <%= Veltix::PLATFORM_NAME %>, PVC pencere/kapı ve imalat işletmelerinin
+  günlük operasyonunu tek ekrandan yönetmesi için gereken tüm modülleri
+  içerir — ayrı ayrı Excel dosyaları veya kağıt kayıtlarla uğraşmadan.
+</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-sm-6 col-lg-4">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-boxes"></i>
+      <h2 class="h6 mb-1">Stok &amp; Ürün Takibi</h2>
+      <p class="small text-muted mb-0">
+        Kategori, seri, renk ve marka bazında ürün kartları; m², metretül ve
+        adet gibi birim bazlı stok takibi; düşük stok uyarıları ve toplu
+        stok sayımı.
+      </p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-magic"></i>
+      <h2 class="h6 mb-1">Yapay Zeka ile PDF Okuma</h2>
+      <p class="small text-muted mb-0">
+        Tedarikçi faturası, sipariş listesi veya vergi levhası gibi
+        belgeleri yükleyin — yapay zeka ürün satırlarını, tutarları ve
+        firma bilgilerini otomatik çıkarır.
+      </p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-arrow-left-right"></i>
+      <h2 class="h6 mb-1">Satış &amp; Alış Yönetimi</h2>
+      <p class="small text-muted mb-0">
+        Satış ve alış faturalarını onay akışıyla oluşturun; onaylandığında
+        stok otomatik güncellenir, irsaliye/fatura PDF'i tek tıkla
+        oluşturulur.
+      </p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-wallet2"></i>
+      <h2 class="h6 mb-1">Cari Hesap Yönetimi</h2>
+      <p class="small text-muted mb-0">
+        Müşteri ve tedarikçi bakiyelerini, tahsilat/ödeme kayıtlarını ve
+        cari hesap ekstrelerini (PDF) tek yerden takip edin.
+      </p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-file-earmark-bar-graph"></i>
+      <h2 class="h6 mb-1">Raporlama &amp; Dışa Aktarma</h2>
+      <p class="small text-muted mb-0">
+        Ürün, kategori, cari ve stok hareketi listelerini Excel veya PDF
+        olarak dışa aktarın; aylık iş özeti raporları oluşturun.
+      </p>
+    </div>
+  </div>
+  <div class="col-sm-6 col-lg-4">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-buildings"></i>
+      <h2 class="h6 mb-1">Çoklu Firma Desteği</h2>
+      <p class="small text-muted mb-0">
+        Her firma kendi kapalı alanında çalışır; kayıtlar, stoklar ve cari
+        hesaplar firmalar arasında asla karışmaz.
+      </p>
+    </div>
+  </div>
+</div>
+
+<div class="card border-0 landing-cta-card mb-4">
+  <div class="card-body p-4 d-flex flex-wrap align-items-center justify-content-between gap-3">
+    <div>
+      <h2 class="h5 mb-1 text-white">Platformu canlı görmek ister misiniz?</h2>
+      <p class="mb-0 text-white-50">Kısa bir demo ile işletmenize nasıl uyduğunu birlikte inceleyelim.</p>
+    </div>
+    <%= link_to "Demo Talep Edin", new_demo_request_path, class: "btn btn-light btn-lg text-nowrap" %>
+  </div>
+</div>

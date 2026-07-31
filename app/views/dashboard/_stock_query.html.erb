@@ -1,0 +1,38 @@
+<div>
+  <%= form_with url: root_path, method: :get, class: "dashboard-search__form" do %>
+    <i class="bi bi-search dashboard-search__icon"></i>
+    <%= text_field_tag :stock_query, @stock_query, class: "form-control dashboard-search__input", placeholder: "Ürün kodu veya adı ile stok sorgula..." %>
+    <%= submit_tag "Sorgula", class: "btn btn-primary dashboard-search__submit" %>
+  <% end %>
+
+  <% if @stock_results %>
+    <div class="card mt-3">
+      <div class="card-body">
+        <% if @stock_results.none? %>
+          <p class="text-danger mb-0">"<%= @stock_query %>" ile eşleşen ürün bulunamadı — stokta yok.</p>
+        <% else %>
+          <table class="table table-sm table-striped align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Kod</th>
+                <th>Ad</th>
+                <th>Kategori</th>
+                <th class="text-end">Stok</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @stock_results.each do |product| %>
+                <tr class="<%= "table-warning" if product.low_stock? %>">
+                  <td><%= product.code %></td>
+                  <td><%= product.name %></td>
+                  <td><%= product.category.name %></td>
+                  <td class="text-end fw-bold"><%= product.stock_quantity %> <%= product.unit_label %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

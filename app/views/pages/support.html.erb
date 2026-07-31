@@ -1,0 +1,32 @@
+<% content_for :title, "Destek" %>
+
+<span class="section-eyebrow mb-3 d-inline-flex"><i class="bi bi-life-preserver"></i> Destek</span>
+<h1 class="h3 mb-3">Size nasıl yardımcı olabiliriz?</h1>
+<p class="lead text-muted mb-4">
+  Zaten müşterimizseniz hesabınıza kayıtlı kullanıcı bilgilerinizle giriş
+  yapıp sistemi kullanabilirsiniz. Yeni bir talebiniz veya sorunuz varsa
+  aşağıdaki formdan bize ulaşın.
+</p>
+
+<div class="row g-3 mb-4">
+  <div class="col-md-6">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-box-arrow-in-right"></i>
+      <h2 class="h6 mb-1">Zaten Müşterimiz misiniz?</h2>
+      <p class="small text-muted mb-0">
+        Hesabınıza giriş yapıp doğrudan sisteme erişebilirsiniz.
+      </p>
+      <%= link_to "Giriş Yap", new_session_path, class: "btn btn-sm btn-outline-primary mt-2" %>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="landing-feature-light h-100">
+      <i class="bi bi-envelope"></i>
+      <h2 class="h6 mb-1">Yeni Bir Talebiniz mi Var?</h2>
+      <p class="small text-muted mb-0">
+        Demo, teklif veya genel bir sorunuz için formu doldurun, size dönüş yapalım.
+      </p>
+      <%= link_to "Bize Ulaşın", new_demo_request_path, class: "btn btn-sm btn-outline-primary mt-2" %>
+    </div>
+  </div>
+</div>

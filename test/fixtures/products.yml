@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  company: one
+  name: MyString
+  category: one
+  unit: 1
+  stock_quantity: 9.99
+
+two:
+  company: one
+  name: MyString
+  category: two
+  unit: 1
+  stock_quantity: 9.99

@@ -1,0 +1,121 @@
+<% content_for :title, "PDF Önizleme — Satış" %>
+
+<span class="flow-badge flow-badge--sale mb-2"><i class="bi bi-cart-check"></i> Satış</span>
+<h1 class="h3 mb-1">PDF'ten Okunan Veriyi Gözden Geçirin</h1>
+<p class="text-muted">
+  Aşağıdaki bilgiler PDF'ten yapay zeka ile okundu, henüz hiçbir şey kaydedilmedi.
+  Kontrol edin, gerekirse düzeltin, sonra onaylayın.
+</p>
+
+<% if flash[:alert] %>
+  <div class="alert alert-danger"><%= flash[:alert] %></div>
+<% end %>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="position-sticky" style="top: 1rem;">
+      <% if @pdf_blob %>
+        <iframe src="<%= rails_blob_path(@pdf_blob, disposition: "inline") %>" style="width: 100%; height: 82vh; border: 1px solid var(--bs-border-color); border-radius: 0.5rem;"></iframe>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <%= form_with url: confirm_pdf_sales_path, method: :post, scope: :sale, data: { controller: "edit-tracker" }, class: "row g-3" do %>
+      <%= hidden_field_tag "sale[pdf_blob_signed_id]", @pdf_blob&.signed_id %>
+
+      <div class="col-12">
+        <% if @matched_customer %>
+          <div class="alert alert-info d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-check-circle"></i>
+            <div><strong><%= @matched_customer.name %></strong> ile eşleşti<%= " (kod: #{@matched_customer.code})" if @matched_customer.code.present? %>. Onaylarsanız bu carinin hesabına işlenecek.</div>
+          </div>
+        <% else %>
+          <div class="alert alert-warning d-flex align-items-center gap-2 mb-2">
+            <i class="bi bi-person-plus"></i>
+            <div>Sistemde eşleşen müşteri bulunamadı — <strong>yeni müşteri</strong> olarak oluşturulacak. Bilgileri kontrol edip tamamlayın.</div>
+          </div>
+        <% end %>
+      </div>
+
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Cari Kodu (opsiyonel)</label>
+        <%= text_field_tag "sale[customer][code]", @data.dig(:customer, :code), id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Müşteri Adı</label>
+        <%= text_field_tag "sale[customer][name]", @data.dig(:customer, :name), id: nil, required: true, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">VKN/TCKN (opsiyonel)</label>
+        <%= text_field_tag "sale[customer][tax_number]", @data.dig(:customer, :tax_number), id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Vergi Dairesi (opsiyonel)</label>
+        <%= text_field_tag "sale[customer][tax_office]", @data.dig(:customer, :tax_office), id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Telefon (opsiyonel)</label>
+        <%= text_field_tag "sale[customer][phone]", @data.dig(:customer, :phone), id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Adres (opsiyonel)</label>
+        <%= text_field_tag "sale[customer][address]", @data.dig(:customer, :address), id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Satış Tarihi</label>
+        <%= date_field_tag "sale[sale_date]", @data[:sale_date], id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Sipariş No (opsiyonel)</label>
+        <%= text_field_tag "sale[order_number]", @data[:order_number], id: nil, class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+      <div class="col-md-4" data-edit-tracker-target="wrapper">
+        <label class="form-label">Genel İskonto %</label>
+        <%= number_field_tag "sale[discount_rate]", @data[:discount_rate] || 0, id: nil, step: "any", class: "form-control", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %>
+        <span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değiştirildi</span>
+      </div>
+
+      <div class="col-12">
+        <h2 class="h5 mt-3 mb-2">Ürün Satırları</h2>
+        <table class="table table-sm align-middle">
+          <thead>
+            <tr>
+              <th>Ürün Adı</th>
+              <th style="width:110px">Miktar</th>
+              <th style="width:100px">Birim</th>
+              <th style="width:140px">Birim Fiyat</th>
+              <th style="width:100px">KDV %</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% Array(@data[:lines]).each do |line| %>
+              <tr>
+                <td data-edit-tracker-target="wrapper"><%= text_field_tag "sale[lines][][name]", line[:name], id: nil, class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= number_field_tag "sale[lines][][quantity]", line[:quantity], id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= text_field_tag "sale[lines][][unit]", line[:unit], id: nil, class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= number_field_tag "sale[lines][][unit_price]", line[:unit_price], id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td data-edit-tracker-target="wrapper"><%= number_field_tag "sale[lines][][vat_rate]", line[:vat_rate] || 20, id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="col-12">
+        <%= submit_tag "Onayla ve Kaydet", class: "btn btn-success btn-lg" %>
+        <%= link_to "Vazgeç", sales_path, class: "btn btn-link" %>
+      </div>
+    <% end %>
+  </div>
+</div>

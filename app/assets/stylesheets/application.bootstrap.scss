@@ -1,0 +1,1326 @@
+// Elit tema değişkenleri — Bootstrap'in kendi !default değerlerini ezmek için
+// import'tan önce tanımlanır.
+$primary:   #3730a3; // indigo-800
+$secondary: #64748b; // slate-500
+$success:   #15803d; // green-700 — Satış / gelir
+$info:      #0891b2; // cyan-600
+$warning:   #d97706; // amber-600
+$danger:    #b91c1c; // red-700
+$light:     #f8fafc;
+$dark:      #0f172a; // slate-900
+
+$body-bg:    #eef1f6;
+$body-color: #1e293b; // slate-800
+
+$font-family-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", Roboto, Helvetica, Arial, sans-serif;
+$font-size-base: 0.95rem;
+$headings-font-weight: 700;
+$headings-color: $dark;
+
+$border-radius:    0.65rem;
+$border-radius-sm: 0.5rem;
+$border-radius-lg: 0.9rem;
+$border-radius-xl: 1.25rem;
+
+$box-shadow-sm: 0 1px 2px rgba(15, 23, 42, .06);
+$box-shadow:    0 4px 14px rgba(15, 23, 42, .08);
+$box-shadow-lg: 0 12px 32px rgba(15, 23, 42, .14);
+
+$card-border-width: 0;
+$card-box-shadow: $box-shadow-sm;
+$input-btn-focus-box-shadow: 0 0 0 .2rem rgba($primary, .18);
+
+$theme-colors: (
+  "primary":   $primary,
+  "secondary": $secondary,
+  "success":   $success,
+  "info":      $info,
+  "warning":   $warning,
+  "danger":    $danger,
+  "light":     $light,
+  "dark":      $dark,
+  // Alış / gider işlemleri için ayrı bir renk — Satış (yeşil) ile karışmasın diye.
+  "purchase":  #b45309,
+);
+
+@import 'bootstrap/scss/bootstrap';
+@import 'bootstrap-icons/font/bootstrap-icons';
+
+:root {
+  --app-header-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 55%, #312e81 100%);
+  --accent-purchase: #b45309;
+  --shine-duration: 1.4s;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba($primary, .35) transparent;
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background-color: rgba($primary, .28);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background-color: rgba($primary, .45); }
+
+::selection {
+  background: rgba($primary, .22);
+  color: $dark;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+}
+
+body {
+  background:
+    radial-gradient(circle at top left, rgba(55, 48, 163, .07), transparent 42%),
+    radial-gradient(circle at 85% 15%, rgba(21, 128, 61, .05), transparent 38%),
+    radial-gradient(rgba(15, 23, 42, .05) 1px, transparent 1px) 0 0 / 22px 22px,
+    $body-bg;
+  min-height: 100vh;
+}
+
+// Not: body'de bir giriş animasyonu YOK bilerek — Turbo Drive her navigasyonda
+// önce önbellekteki sürümü gösterip sonra taze içerikle değiştiriyor; body'ye
+// bağlı bir animasyon bu iki adımda da yeniden tetiklenip sayfanın "iki kez
+// açılıyormuş" gibi görünmesine (görünür bir titreşim/flaş) yol açıyordu.
+
+@keyframes soft-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba($danger, .35); }
+  50%      { box-shadow: 0 0 0 6px rgba($danger, 0); }
+}
+
+// ---- Navbar -----------------------------------------------------------
+.navbar {
+  background: var(--app-header-gradient) !important;
+  background-size: 140% 140% !important;
+  box-shadow: 0 2px 24px rgba(15, 23, 42, .35);
+  backdrop-filter: saturate(160%) blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, .06);
+  // backdrop-filter kendi stacking context'ini açar — bu context'e açık bir
+  // z-index verilmezse, içindeki dropdown-menu'nün z-index'i artık sadece
+  // navbar'ın KENDİ içinde geçerli olur ve navbar'ın tamamı DOM sırasına göre
+  // altındaki .container'ın arkasında kalabilir. Navbar'ı üst seviyede sabit
+  // tutuyoruz ki dropdown her zaman sayfa içeriğinin üstünde açılsın.
+  position: relative;
+  z-index: 1030;
+}
+
+.navbar-brand {
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+}
+
+.navbar-logo-chip {
+  display: inline-flex;
+  align-items: center;
+}
+
+.navbar-logo {
+  height: 34px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, .35));
+}
+
+// Firma kendi logosunu yüklememişse — Veltix'in kendi markası değil, firmanın
+// baş harfleri gösterilir (bkz. company_initials): navbar/hero panel burada
+// Veltix'i değil, giriş yapılan firmayı temsil etmeli.
+.navbar-logo-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: $border-radius-sm;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(199, 210, 254, .65));
+  color: $primary;
+  font-weight: 800;
+  font-size: .8rem;
+  letter-spacing: -0.02em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+}
+
+.navbar-brand i {
+  background: linear-gradient(135deg, #a5b4fc, #fff);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 6px rgba(165, 180, 252, .35));
+}
+
+.navbar .nav-link,
+.navbar .dropdown-toggle {
+  font-weight: 500;
+  opacity: .92;
+  position: relative;
+  transition: opacity .15s ease, color .15s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .dropdown-toggle:hover {
+  opacity: 1;
+}
+
+// ---- Ana sekmeler (Stok/Alış/Satış/Yönetim) — dropdown yerine düz,
+// doğrudan tıklanabilir sekmeler; aktif olan dolgu renkle vurgulanır.
+.nav-tabs-flat {
+  gap: .25rem;
+}
+
+.nav-tabs-flat .nav-link {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .5rem 1rem;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, .78);
+  font-weight: 600;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.nav-tabs-flat .nav-link:hover {
+  background: rgba(255, 255, 255, .08);
+  color: #fff;
+}
+
+.nav-tabs-flat .nav-link.active {
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .12);
+}
+
+.navbar-profile-link {
+  color: rgba(255, 255, 255, .85) !important;
+  text-decoration: none;
+  padding: .3rem .6rem;
+  border-radius: $border-radius-sm;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.navbar-profile-link:hover {
+  background: rgba(255, 255, 255, .1);
+  color: #fff !important;
+}
+
+// ---- Alt sekme şeridi — o an aktif olan ana bölümün (Stok/Alış/Satış/
+// Yönetim) sayfaları arasında gezinmeyi sağlar (bkz. shared/_navbar).
+.sub-tab-bar {
+  background: #fff;
+  border-bottom: 1px solid rgba(15, 23, 42, .08);
+  box-shadow: $box-shadow-sm;
+}
+
+.app-content {
+  padding-top: 1.75rem;
+}
+
+.sub-tabs {
+  display: flex;
+  gap: 1.5rem;
+  overflow-x: auto;
+}
+
+.sub-tab {
+  position: relative;
+  padding: .85rem .1rem;
+  color: $secondary;
+  font-weight: 600;
+  font-size: .92rem;
+  text-decoration: none;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color .15s ease, border-color .15s ease;
+}
+
+.sub-tab:hover {
+  color: $dark;
+}
+
+.sub-tab.active {
+  color: $primary;
+  border-bottom-color: $primary;
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: $box-shadow-lg;
+  border-radius: $border-radius;
+  padding: .4rem;
+  margin-top: .5rem;
+  animation: dropdown-pop .16s cubic-bezier(.2, .9, .3, 1.4) both;
+  transform-origin: top center;
+}
+
+@keyframes dropdown-pop {
+  from { opacity: 0; transform: scale(.94) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.dropdown-item {
+  border-radius: $border-radius-sm;
+  padding: .5rem .75rem;
+  font-weight: 500;
+  transition: background-color .12s ease, transform .12s ease, padding-left .12s ease;
+}
+
+.dropdown-item:hover {
+  background-color: rgba($primary, .08);
+  padding-left: .95rem;
+}
+
+.dropdown-item.text-danger:hover {
+  background-color: rgba($danger, .08);
+}
+
+.dropdown-item i {
+  width: 1.25em;
+  display: inline-block;
+  text-align: center;
+  margin-right: .4rem;
+  opacity: .7;
+}
+
+// ---- Tablo satırlarındaki "İşlemler" kısmı — birden fazla buton yan yana
+// kalabalık durmasın diye tek bir "⋮" menüsüne toplanır (bkz.
+// shared/_actions_menu).
+.actions-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: transparent;
+  color: $secondary;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.actions-menu-toggle:hover,
+.actions-menu-toggle:focus-visible,
+.actions-menu-toggle[aria-expanded="true"] {
+  background: rgba($primary, .1);
+  color: $primary;
+}
+
+.actions-menu-toggle::after {
+  display: none;
+}
+
+// button_to ile üretilen <form>, .dropdown-item olan <button>'ı sarmalıyor —
+// formun kendisi görünmez bir kap, genişliği/kenar boşluğu sıfırlanır ki
+// <li> içinde diğer .dropdown-item'larla hizası bozulmasın.
+.dropdown-menu form.button_to {
+  margin: 0;
+  display: block;
+}
+
+.dropdown-menu form.button_to .dropdown-item {
+  width: 100%;
+  text-align: left;
+  border: none;
+}
+
+// ---- Süper admin firma "geçişi" (impersonation) şeridi ------------------
+// Süper admin Firmalar ekranından başka bir firmaya geçtiğinde, hangi
+// firmanın verisini görüntülediğini unutmasın diye her sayfada görünür.
+.impersonation-bar {
+  background: linear-gradient(135deg, #b45309, #92400e);
+  color: #fff;
+  padding: .6rem 0;
+  font-size: .88rem;
+  font-weight: 600;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, .2);
+}
+
+.impersonation-bar i {
+  margin-right: .3rem;
+}
+
+// ---- Genel bileşenler ---------------------------------------------------
+h1, h2, h3 { letter-spacing: -0.015em; }
+
+.card {
+  border-radius: $border-radius-lg;
+  transition: transform .18s cubic-bezier(.2, .8, .3, 1), box-shadow .18s ease, border-color .18s ease;
+  background: #fff;
+  border: 1px solid #f1f5f9;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+}
+
+a .card,
+.card-link {
+  transition: transform .18s cubic-bezier(.2, .8, .3, 1), box-shadow .18s ease;
+}
+
+a .card:hover {
+  transform: translateY(-4px) scale(1.006);
+  box-shadow: $box-shadow-lg, 0 0 0 1px rgba($primary, .06);
+}
+
+.supplier-card:hover {
+  transform: translateY(-2px);
+  box-shadow: $box-shadow-lg, 0 0 0 1px rgba($primary, .06);
+}
+
+// ---- Baş harf avatarı — tedarikçi/müşteri kartlarında hızlı görsel kimlik.
+.avatar-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #7c3aed, #4338ca);
+  color: #fff;
+  font-weight: 800;
+  font-size: .95rem;
+  letter-spacing: -0.02em;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(76, 29, 149, .25);
+}
+
+.avatar-circle--sm {
+  width: 2rem;
+  height: 2rem;
+  font-size: .74rem;
+  box-shadow: none;
+}
+
+.card-body h2.h6 {
+  text-transform: uppercase;
+  font-size: .72rem;
+  letter-spacing: .07em;
+  font-weight: 700;
+  color: $secondary;
+}
+
+// Sayısal vurgu — stat kartlarındaki büyük rakamlar daha "premium" görünsün.
+.stat-card p.h3,
+.stat-card p.h4,
+.card-body p.h4 {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.table {
+  background-color: #fff;
+  box-shadow: $box-shadow-sm;
+  border-radius: $border-radius;
+  overflow: hidden;
+  // Zebra satırları koyu gri yerine çok açık gri-mor (#f8fafc) — göze daha yumuşak.
+  --bs-table-striped-bg: #f8fafc;
+}
+
+.table thead th {
+  background: linear-gradient(180deg, #fbfcfe, #f8fafc);
+  border-bottom-width: 1px;
+  font-size: .78rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: $secondary;
+  font-weight: 700;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.table-hover tbody tr {
+  transition: background-color .12s ease, box-shadow .12s ease;
+}
+
+.table-hover tbody tr:hover {
+  background-color: rgba($primary, .045);
+  box-shadow: inset 3px 0 0 rgba($primary, .55);
+}
+
+// ---- Düz (zebrasız) tablo — çizelge/log niteliğindeki listelerde (Stok
+// Hareketleri, Stok Düzeltme Geçmişi) her satır bembeyaz, aralarında yalnızca
+// ince bir çizgi; hover'da hafif parlama.
+.table-flat {
+  --bs-table-striped-bg: transparent;
+}
+
+.table-flat tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.table-flat tbody tr:hover {
+  background-color: #f8fafc;
+  box-shadow: none;
+}
+
+// ---- Segment/sekme şeridi — filtre olarak davranan bağlantı grubu (bkz.
+// Stok Hareketleri "Tüm/Giriş/Çıkış" sekmeleri).
+.filter-tabs {
+  display: inline-flex;
+  gap: .25rem;
+  padding: .25rem;
+  background: #f1f5f9;
+  border-radius: 999px;
+}
+
+.filter-tabs__link {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: .4rem .9rem;
+  border-radius: 999px;
+  font-size: .84rem;
+  font-weight: 650;
+  color: $secondary;
+  text-decoration: none;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.filter-tabs__link:hover {
+  color: $dark;
+}
+
+.filter-tabs__link.active {
+  background: #fff;
+  color: $primary;
+  box-shadow: $box-shadow-sm;
+}
+
+.badge {
+  font-weight: 650;
+  letter-spacing: .01em;
+  padding: .42em .68em;
+  border-radius: 999px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, .08);
+}
+
+.badge.bg-danger {
+  animation: soft-pulse 2.2s ease-in-out infinite;
+}
+
+// Liste sayfalarında kategori adını göstermek için — sert bir Bootstrap
+// badge yerine markanın rengine uyan yumuşak (soft) bir rozet.
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: .32em .75em;
+  border-radius: 6px;
+  background: rgba($primary, .1);
+  color: $primary;
+  font-weight: 650;
+  font-size: .82rem;
+  white-space: nowrap;
+}
+
+// ---- Pastel (soft) durum rozetleri — ham bg-success/bg-danger yerine göz
+// yormayan tonlar (bkz. stok hareketi yönü, tedarikçi/müşteri bakiye rozeti).
+.badge-soft-success {
+  background: #d1fae5;
+  color: #065f46;
+  box-shadow: none;
+}
+
+.badge-soft-danger {
+  background: #fee2e2;
+  color: #991b1b;
+  box-shadow: none;
+}
+
+.badge-soft-warning {
+  background: #fef3c7;
+  color: #92400e;
+  box-shadow: none;
+}
+
+// ---- Liste filtre paneli — her liste sayfasında tutarlı bir "arama/filtre
+// kutusu" görünümü versin diye (bkz. shared filtre formları).
+.filter-panel {
+  background: rgba($primary, .035);
+  border: 1px solid rgba($primary, .1);
+  box-shadow: none;
+}
+
+.filter-panel .form-label {
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  font-size: .7rem;
+  font-weight: 700;
+}
+
+// Filtre panelindeki tüm kontrollerin (arama, seçim, tarih, buton) aynı
+// yükseklikte hizalanması için — tarayıcılar arası küçük farkları eler.
+.filter-panel .form-control,
+.filter-panel .form-select,
+.filter-panel .btn {
+  height: calc(2.375rem + 2px);
+}
+
+// ---- Büyüteç ikonlu, birleşik görünümlü arama kutusu (bkz. shared/_search_field).
+.search-input-group {
+  position: relative;
+}
+
+.search-input-group__icon {
+  position: absolute;
+  top: 50%;
+  left: .85rem;
+  transform: translateY(-50%);
+  color: $secondary;
+  font-size: .9rem;
+  pointer-events: none;
+}
+
+.search-input-group__field {
+  padding-left: 2.25rem;
+}
+
+// ---- Sıralanabilir liste kolon başlıkları --------------------------------
+.sortable-th {
+  color: inherit;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  transition: color .15s ease;
+}
+
+.sortable-th:hover {
+  color: $primary;
+}
+
+.sortable-th i {
+  font-size: .78em;
+  opacity: .45;
+}
+
+.sortable-th.active {
+  color: $primary;
+}
+
+.sortable-th.active i {
+  opacity: .9;
+}
+
+.btn {
+  font-weight: 650;
+  border-radius: $border-radius;
+  transition: transform .12s cubic-bezier(.3, .7, .4, 1.5), box-shadow .16s ease, filter .16s ease, background-position .3s ease;
+  background-size: 160% 160%;
+  background-position: 0% 0%;
+}
+
+.btn:hover {
+  background-position: 100% 100%;
+}
+
+.btn:active {
+  transform: scale(.96);
+}
+
+.btn:focus-visible {
+  outline: none;
+}
+
+.btn-lg {
+  border-radius: $border-radius-lg;
+}
+
+.btn-primary,
+.btn-success,
+.btn-purchase,
+.btn-danger {
+  border: none;
+  box-shadow: 0 3px 10px rgba(15, 23, 42, .16), inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+
+.btn-primary { background-image: linear-gradient(135deg, #4338ca, $primary 65%, #2e2a86); }
+.btn-success { background-image: linear-gradient(135deg, #16a34a, $success 65%, #0f5c2c); }
+.btn-danger  { background-image: linear-gradient(135deg, #dc2626, $danger 65%, #8f1616); }
+.btn-purchase {
+  background-image: linear-gradient(135deg, #d97706, map-get($theme-colors, "purchase") 65%, #7c3a05);
+  color: #fff;
+}
+.btn-outline-purchase {
+  color: map-get($theme-colors, "purchase");
+  border-color: map-get($theme-colors, "purchase");
+}
+.btn-outline-purchase:hover {
+  background-color: map-get($theme-colors, "purchase");
+  border-color: map-get($theme-colors, "purchase");
+  color: #fff;
+}
+
+.btn-primary:hover,
+.btn-success:hover,
+.btn-danger:hover,
+.btn-purchase:hover {
+  box-shadow: 0 6px 18px rgba(15, 23, 42, .22), inset 0 1px 0 rgba(255, 255, 255, .18);
+  filter: brightness(1.04);
+}
+
+.form-control,
+.form-select {
+  border-radius: $border-radius-sm;
+  transition: border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+}
+
+.form-control-lg,
+.form-select-lg {
+  border-radius: $border-radius;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: rgba($primary, .5);
+  background-color: #fff;
+}
+
+.alert {
+  border: none;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow-sm;
+}
+
+// ---- Satış / Alış görsel dili -----------------------------------------
+// Satış = yeşil (gelir yönü), Alış = amber (gider yönü) — uygulama genelinde
+// tutarlı olsun diye tekilleştirildi.
+.flow-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  font-size: .72rem;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  font-weight: 700;
+  padding: .32em .7em;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(15, 23, 42, .03);
+}
+
+.flow-badge--sale {
+  background: linear-gradient(135deg, rgba($success, .16), rgba($success, .08));
+  color: $success;
+}
+
+.flow-badge--purchase {
+  background: linear-gradient(135deg, rgba(map-get($theme-colors, "purchase"), .16), rgba(map-get($theme-colors, "purchase"), .08));
+  color: map-get($theme-colors, "purchase");
+}
+
+.stat-card {
+  border-radius: $border-radius-lg;
+  border-left: 4px solid transparent;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, .5), transparent 40%);
+  pointer-events: none;
+}
+
+.stat-card--sale { border-left-color: $success; }
+.stat-card--purchase { border-left-color: map-get($theme-colors, "purchase"); }
+.stat-card--stock { border-left-color: $info; }
+.stat-card--alert { border-left-color: $warning; }
+
+// Aynı zamanda filtre olarak da davranan stat kartları (ör. Ürünler/
+// Kategoriler sayfasındaki grup kartları) — tıklanabilir olduklarını
+// belli etsin ve o an seçili olan görünsün diye.
+a .stat-card {
+  border-left-color: transparent;
+  border-color: #f1f5f9;
+  cursor: pointer;
+}
+
+a .stat-card--active {
+  border-color: $primary;
+  box-shadow: $box-shadow-lg, 0 0 0 1px rgba($primary, .12);
+  background: linear-gradient(135deg, rgba($primary, .1), rgba($primary, .02));
+}
+
+// Filtre kartlarındaki sol ikon rozeti + sağdaki sayı rozeti (bkz. Ürünler/
+// Kategoriler sayfası grup kartları).
+.stat-card__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: $border-radius;
+  background: rgba($primary, .1);
+  color: $primary;
+  font-size: 1.05rem;
+  flex-shrink: 0;
+}
+
+.stat-card__count {
+  font-size: .8rem;
+  background: rgba($secondary, .12);
+  color: $dark;
+  box-shadow: none;
+}
+
+.stat-card__count--warning {
+  background: rgba($warning, .25);
+  color: darken($warning, 25%);
+}
+
+.stat-card__icon--warning { background: rgba($warning, .15); color: darken($warning, 12%); }
+.stat-card__icon--success { background: rgba($success, .15); color: $success; }
+.stat-card__icon--purchase { background: rgba(map-get($theme-colors, "purchase"), .15); color: map-get($theme-colors, "purchase"); }
+.stat-card__icon--info { background: rgba($info, .18); color: darken($info, 10%); }
+
+a .stat-card--active .stat-card__icon {
+  background: $primary;
+  color: #fff;
+}
+
+a .stat-card--active .stat-card__count {
+  background: $primary;
+  color: #fff;
+}
+
+.section-eyebrow {
+  text-transform: uppercase;
+  font-size: .74rem;
+  letter-spacing: .07em;
+  font-weight: 700;
+  color: $secondary;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+}
+
+.low-stock-toggle__chevron {
+  transition: transform .2s ease;
+}
+
+.low-stock-toggle[aria-expanded="true"] .low-stock-toggle__chevron {
+  transform: rotate(180deg);
+}
+
+// Aynı isimli müşteri/tedarikçi çapraz uyarı kartı
+.cross-link-alert {
+  border-radius: $border-radius;
+  background: rgba($info, .08);
+  border: 1px solid rgba($info, .25);
+  color: darken($info, 12%);
+}
+
+// ---- Ana sayfa karşılama bölümü (hero) ---------------------------------
+// Gerçek logo (app/assets/images/polat-pencere-logo.png) ve gerçek ürün
+// fotoğrafları (polatpencere.com'dan) kullanılıyor — shared/_brand_mark
+// içinde logo yoksa tipografik bir yedeğe düşülür.
+.hero-panel {
+  position: relative;
+  overflow: hidden;
+  border-radius: $border-radius-xl;
+  background: var(--app-header-gradient);
+  color: #fff;
+  padding: 2rem 2rem 1.75rem;
+  margin-bottom: 1.75rem;
+  box-shadow: $box-shadow-lg, 0 0 0 1px rgba(255, 255, 255, .04) inset;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.hero-panel::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: .14;
+  background-image:
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, .6) 0 2px, transparent 2px 110px),
+    repeating-linear-gradient(0deg, rgba(255, 255, 255, .6) 0 2px, transparent 2px 110px);
+  pointer-events: none;
+}
+
+// Statik diyagonal parlaklık — animasyonlu değil (Turbo Drive önbellekten
+// önizleme gösterip taze içerikle değiştirdiğinde animasyonlar yeniden
+// tetiklenip görünür bir "çift açılış" titreşimine yol açıyordu).
+.hero-panel::after {
+  content: "";
+  position: absolute;
+  top: -40%;
+  left: -20%;
+  width: 45%;
+  height: 220%;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .1), transparent);
+  pointer-events: none;
+}
+
+.hero-panel__body {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.hero-panel__brand {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  margin-bottom: 1rem;
+}
+
+.hero-panel__brand-mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: $border-radius-sm;
+  background: linear-gradient(135deg, rgba(255, 255, 255, .92), rgba(199, 210, 254, .65));
+  color: $primary;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, .25);
+  flex-shrink: 0;
+}
+
+.hero-panel__brand-name {
+  font-weight: 800;
+  letter-spacing: .04em;
+  font-size: 1rem;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, .92);
+}
+
+.hero-panel__brand-logo {
+  display: inline-flex;
+  align-items: center;
+}
+
+.hero-panel__brand-logo img {
+  height: 40px;
+  width: auto;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, .35));
+}
+
+.hero-panel .flow-badge {
+  background: rgba(255, 255, 255, .16);
+  color: #fff;
+  box-shadow: none;
+}
+
+.hero-panel p {
+  color: rgba(255, 255, 255, .78);
+}
+
+// $headings-color global olarak koyu lacivert ($dark) — hero panel de koyu
+// zeminli olduğu için override edilmezse başlık neredeyse görünmez olur.
+.hero-panel h1,
+.hero-panel h2,
+.hero-panel h3 {
+  color: #fff;
+}
+
+// Kendi ürün fotoğrafımız (polatpencere.com) — dekoratif, sağ tarafta.
+.hero-panel__art {
+  position: relative;
+  flex: 0 0 auto;
+  width: 220px;
+  height: 140px;
+  border-radius: $border-radius-lg;
+  overflow: hidden;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, .4), 0 0 0 1px rgba(255, 255, 255, .1);
+}
+
+.hero-panel__art::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(15, 23, 42, .1), rgba(49, 46, 129, .4));
+  pointer-events: none;
+}
+
+.hero-panel__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform .5s ease;
+}
+
+.hero-panel:hover .hero-panel__photo {
+  transform: scale(1.06);
+}
+
+// Birden fazla foroğraf verildiğinde (bkz. hero-panel__art--slideshow) yavaşça
+// birbirine geçiş yaparak dönüşen bir slayt gösterisi oluşturur.
+.hero-panel__art--slideshow .hero-panel__photo {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  animation: heroPhotoFade 12s infinite;
+}
+
+.hero-panel__art--slideshow .hero-panel__photo:nth-child(1) { animation-delay: 0s; }
+.hero-panel__art--slideshow .hero-panel__photo:nth-child(2) { animation-delay: 6s; }
+
+@keyframes heroPhotoFade {
+  0%, 42% { opacity: 1; }
+  50%, 92% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.glance-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .35rem .75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-size: .82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background .15s ease;
+}
+
+.glance-pill:hover {
+  background: rgba(255, 255, 255, .24);
+  color: #fff;
+}
+
+.glance-pill .badge {
+  font-size: .78rem;
+}
+
+@media (max-width: 767.98px) {
+  .hero-panel { flex-wrap: wrap; }
+  .hero-panel__art { width: 100%; height: 120px; }
+}
+
+.hero-actions .btn {
+  font-weight: 650;
+}
+
+.hero-actions .btn-light {
+  color: $dark;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, .25);
+}
+
+// Anasayfa karşılama banner'ının daha içi dolu, kısa hâli — foto/aksiyon
+// butonları olmadan yalnız selamlama + özet rozetleri.
+.hero-panel--compact {
+  padding: 1.35rem 1.75rem 1.15rem;
+}
+
+// ---- Anasayfa hızlı stok arama çubuğu — kapalı bir "kart" yerine üstte
+// duran minimalist, hap şeklinde bir arama barı.
+.dashboard-search__form {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  max-width: 640px;
+  margin: 0 auto;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  padding: .35rem .35rem .35rem 1.1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, .05);
+}
+
+.dashboard-search__icon {
+  color: $secondary;
+  font-size: 1rem;
+}
+
+.dashboard-search__input {
+  border: none;
+  box-shadow: none;
+  flex: 1 1 auto;
+}
+
+.dashboard-search__input:focus {
+  box-shadow: none;
+}
+
+.dashboard-search__submit {
+  border-radius: 999px;
+  flex-shrink: 0;
+}
+
+.hero-actions .btn-light:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, .3);
+}
+
+// ---- Giriş / karşılama sayfası (sessions#new) --------------------------
+// Henüz kimse giriş yapmadığı için firmaya özel bir şey gösteremeyiz (bkz.
+// Current — tenant kullanıcı girişten sonra belli oluyor); bu yüzden burada
+// hero-panel'den farklı olarak PLATFORM_NAME ve genel ürün fotoğrafları
+// kullanılıyor, firma logosu değil.
+// ---- Açık zeminli anasayfa hero'su (bkz. dashboard/guest_home) — koyu
+// gradyanlı eski .landing-panel'in yerini aldı; sade beyaz/lavanta zemin,
+// solda metin+CTA, sağda basit CSS ile çizilmiş bir "dashboard" illüstrasyonu.
+.hero-light {
+  padding: 3rem 0 2.5rem;
+}
+
+.hero-light__badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  padding: .4em .9em;
+  border-radius: 999px;
+  background: rgba($primary, .08);
+  color: $primary;
+  font-size: .74rem;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  box-shadow: inset 0 0 0 1px rgba($primary, .16);
+}
+
+.hero-light h1 {
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
+.hero-light__lead {
+  color: $secondary;
+  max-width: 46ch;
+}
+
+.hero-illustration {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  margin: 0 auto;
+  min-height: 300px;
+}
+
+.hero-illustration__card {
+  position: absolute;
+  inset: 1.5rem 1rem;
+  border-radius: $border-radius-xl;
+  background: linear-gradient(160deg, #ffffff, #f1f0ff);
+  box-shadow: $box-shadow-lg;
+  border: 1px solid rgba($primary, .08);
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: .85rem;
+}
+
+.hero-illustration__icon {
+  width: 3rem;
+  height: 3rem;
+  border-radius: $border-radius;
+  background: linear-gradient(135deg, #7c3aed, #4338ca);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  margin-bottom: .35rem;
+  box-shadow: 0 6px 16px rgba(76, 29, 149, .3);
+}
+
+.hero-illustration__bar {
+  height: .6rem;
+  border-radius: 999px;
+  background: rgba($primary, .14);
+}
+
+.hero-illustration__bar--accent {
+  background: rgba($primary, .26);
+}
+
+.hero-illustration__chip {
+  position: absolute;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  padding: .55rem .95rem;
+  border-radius: 999px;
+  background: #fff;
+  box-shadow: $box-shadow-lg;
+  font-size: .8rem;
+  font-weight: 650;
+  color: $dark;
+  white-space: nowrap;
+}
+
+.hero-illustration__chip--top {
+  top: 0;
+  right: -.5rem;
+}
+
+.hero-illustration__chip--bottom {
+  bottom: 0;
+  left: -1rem;
+}
+
+@media (max-width: 767.98px) {
+  .hero-illustration { max-width: 280px; min-height: 240px; }
+}
+
+.landing-panel__form-col {
+  position: relative;
+  background: rgba(15, 23, 42, .12);
+}
+
+.landing-login-card {
+  position: relative;
+  border-radius: $border-radius-xl;
+  overflow: hidden;
+}
+
+.landing-login-card__accent {
+  height: 5px;
+  background: var(--app-header-gradient);
+}
+
+.landing-login-card__brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+// Giriş sayfasının arkasındaki yumuşak, bulanık indigo ışıması — sade beyaz
+// kartın "asılı" görünmemesi, sayfaya biraz derinlik katması için.
+.login-stage {
+  position: relative;
+  padding-top: 2rem;
+}
+
+.login-stage__glow {
+  position: absolute;
+  top: -4rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(560px, 90%);
+  height: 320px;
+  background: radial-gradient(circle, rgba(79, 70, 229, .18), transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.login-stage .row {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 991.98px) {
+  .landing-panel__form-col {
+    background: transparent;
+  }
+}
+
+// Açık (beyaz) zeminli sayfalarda (ör. Hakkımızda) kullanılan özellik kartı —
+// .landing-feature'ın koyu zeminli hero için değil, düz sayfa içeriği için
+// olan karşılığı.
+.landing-feature-light {
+  height: 100%;
+  padding: 1.1rem 1.2rem;
+  border-radius: $border-radius;
+  background: #fff;
+  box-shadow: $box-shadow-sm;
+}
+
+.landing-feature-light i {
+  font-size: 1.5rem;
+  color: $primary;
+  margin-bottom: .5rem;
+  display: block;
+}
+
+.landing-cta-card {
+  border-radius: $border-radius-xl;
+  background: var(--app-header-gradient);
+  box-shadow: $box-shadow-lg;
+}
+
+// ---- Ziyaretçi kabuğu (Anasayfa / Hakkımızda / Giriş) -------------------
+// Giriş yapmamış ziyaretçilerin gezindiği sayfalar (bkz. layouts/guest) ortak
+// bir üst navbar paylaşır — sol sidebar yerine, cam efektli (blur) sabit bir
+// header (henüz hangi firmaya ait olduğu bilinmiyor, bkz. acts_as_tenant).
+.guest-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1020;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(15, 23, 42, .55);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+.guest-navbar__inner {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: .85rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.guest-navbar__brand {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-weight: 800;
+  letter-spacing: .01em;
+  color: #fff;
+  text-decoration: none;
+  font-size: .95rem;
+  flex-shrink: 0;
+}
+
+.guest-navbar__links {
+  flex: 1 1 auto;
+  display: flex;
+  gap: 1.25rem;
+}
+
+.guest-navbar__link {
+  color: rgba(255, 255, 255, .78);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: .88rem;
+  transition: color .15s ease;
+}
+
+.guest-navbar__link:hover,
+.guest-navbar__link.active {
+  color: #fff;
+}
+
+.guest-content {
+  padding-top: 1.5rem;
+  padding-bottom: 1.5rem;
+}
+
+// ---- Boş liste durumları -------------------------------------------------
+// Tablolar hiç satır içermediğinde sade bir mesaj göstermek için opsiyonel
+// yardımcı sınıf — kullanılmazsa hiçbir etkisi yok.
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: $secondary;
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  opacity: .35;
+  margin-bottom: .75rem;
+  display: block;
+}

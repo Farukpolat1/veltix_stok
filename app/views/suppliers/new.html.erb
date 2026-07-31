@@ -1,0 +1,16 @@
+<% content_for :title, "Yeni Tedarikçi" %>
+
+<h1 class="h3 mb-3">Yeni Tedarikçi</h1>
+
+<div class="card mb-3">
+  <div class="card-body">
+    <h2 class="h6 mb-2"><i class="bi bi-file-earmark-pdf"></i> Belgeden Doldur (opsiyonel)</h2>
+    <p class="text-muted small mb-2">Vergi levhası ya da fatura başlığı gibi bir PDF yükleyin, formu otomatik doldursun.</p>
+    <%= form_with url: extract_pdf_suppliers_path, method: :post, multipart: true, data: { turbo: false }, class: "d-flex gap-2" do %>
+      <input type="file" name="pdf_file" accept=".pdf" class="form-control">
+      <button type="submit" class="btn btn-outline-primary text-nowrap">PDF'ten Oku</button>
+    <% end %>
+  </div>
+</div>
+
+<%= render "form", supplier: @supplier %>
