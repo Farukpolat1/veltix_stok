@@ -1,0 +1,1 @@
+# polat_pencere_stok
