@@ -3,15 +3,8 @@
     <h2 class="h5 mb-3">Ürün Ekle</h2>
 
     <div class="mb-3">
-      <label class="form-label small text-muted mb-1">Kategoriye göre daralt (ürün adı önerilerini filtreler)</label>
-      <div class="d-flex flex-wrap gap-3">
-        <% categories.each do |category| %>
-          <div class="form-check form-check-inline mb-0">
-            <%= check_box_tag "category_filter_#{param_key}_#{category.id}", category.id, false, class: "form-check-input", data: { category_id: category.id, "product-category-filter-target": "checkbox", action: "change->product-category-filter#applyFilter" } %>
-            <%= label_tag "category_filter_#{param_key}_#{category.id}", category.name, class: "form-check-label small" %>
-          </div>
-        <% end %>
-      </div>
+      <label class="form-label small text-muted mb-1" for="category_filter_<%= param_key %>">Kategoriye göre daralt (ürün adı önerilerini filtreler — birden çok seçilebilir, boşsa hepsi önerilir)</label>
+      <%= select_tag "category_filter_#{param_key}", options_from_collection_for_select(categories.sort_by(&:name), :id, :name), multiple: true, size: 6, class: "form-select", id: "category_filter_#{param_key}", data: { "product-category-filter-target": "select", action: "change->product-category-filter#applyFilter" } %>
     </div>
 
     <%= form_with url: url, method: :post, scope: :"#{param_key}", class: "row g-3 align-items-end" do |f| %>

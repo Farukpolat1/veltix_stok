@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :purchase_invoices, foreign_key: :created_by_id, inverse_of: :created_by, dependent: :restrict_with_error
   has_many :sales, foreign_key: :created_by_id, inverse_of: :created_by, dependent: :restrict_with_error
   has_many :stock_movements, dependent: :restrict_with_error
+  has_many :support_requests, dependent: :restrict_with_error
 
   enum :role, { admin: 0, depo: 1, satis: 2 }
 

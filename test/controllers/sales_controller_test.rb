@@ -39,4 +39,84 @@ class SalesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to root_path
     assert_not_equal "SHOULD-NOT-APPLY", sale.reload.external_order_number
   end
+
+  test "adding lines from a product template computes quantities and respects product overrides" do
+    seller = users(:one)
+    seller.update!(role: :admin)
+    sign_in_as seller
+    customer = Customer.create!(name: "Şablon Testi Müşterisi")
+    sale = Sale.create!(sale_date: Date.current, customer: customer, created_by: seller)
+
+    kasa_cat = Category.create!(name: "Kasa Profili Test", product_type: :profil, color: "Beyaz")
+    kol_cat = Category.create!(name: "Kol Test", product_type: :aksesuar, accessory_type: "Kol")
+    kasa_product = Product.create!(name: "70lik Beyaz Kasa Test", category: kasa_cat, unit: :mtul, stock_quantity: 100)
+    kol_a = Product.create!(name: "Kilitli Kol Test", category: kol_cat, unit: :adet, stock_quantity: 50)
+    kol_b = Product.create!(name: "Kilitsiz Kol Test", category: kol_cat, unit: :adet, stock_quantity: 50)
+
+    template = ProductTemplate.create!(name: "70lik Sürme Test", company: seller.company)
+    perimeter_line = template.template_lines.create!(
+      category: kasa_cat, default_product: kasa_product, label: "Kasa Profili",
+      variable: :perimeter, coefficient: 1.0, waste_factor: 1.05, offset_mm: 200
+    )
+    fixed_line = template.template_lines.create!(
+      category: kol_cat, default_product: kol_a, label: "Kol", variable: :fixed, fixed_quantity: 2
+    )
+
+    get new_from_template_sale_path(sale, product_template_id: template.id)
+    assert_response :success
+
+    post create_from_template_sale_path(sale), params: {
+      product_template_id: template.id,
+      measurements: { perimeter_mm: 5000 },
+      product_ids: { fixed_line.id => kol_b.id },
+      unit_prices: { perimeter_line.id => 100, fixed_line.id => 50 },
+      vat_rates: { perimeter_line.id => 20, fixed_line.id => 20 }
+    }
+
+    assert_redirected_to items_sale_path(sale)
+    assert_equal 2, sale.sale_lines.count
+
+    perimeter_result = sale.sale_lines.find_by(product: kasa_product)
+    assert_equal (((5000 * 1.0 * 1.05) + 200) / 1000.0).round(3), perimeter_result.quantity.to_f.round(3)
+
+    fixed_result = sale.sale_lines.find_by(product: kol_b)
+    assert_equal 2.0, fixed_result.quantity.to_f
+    assert_nil sale.sale_lines.find_by(product: kol_a)
+  end
+
+  test "hardware_schema_lookup line expands into a full kit based on genislik/yukseklik" do
+    seller = users(:one)
+    seller.update!(role: :admin)
+    sign_in_as seller
+    customer = Customer.create!(name: "Donanım Kiti Testi Müşterisi")
+    sale = Sale.create!(sale_date: Date.current, customer: customer, created_by: seller)
+
+    hw_cat = Category.create!(name: "Donanım Test", product_type: :aksesuar, accessory_type: "Test")
+    isp = Product.create!(name: "İspanyolet Test", category: hw_cat, unit: :adet, stock_quantity: 50)
+    mentese = Product.create!(name: "Menteşe Test", category: hw_cat, unit: :adet, stock_quantity: 50)
+
+    cell = HardwareSchemaCell.create!(system: "test_sistem", acilim_tipi: "test_acilim", genislik_min_mm: 400, genislik_max_mm: 700, yukseklik_min_mm: 800, yukseklik_max_mm: 1200)
+    cell.hardware_schema_lines.create!(product: isp, quantity: 1)
+    cell.hardware_schema_lines.create!(product: mentese, quantity: 2)
+
+    template = ProductTemplate.create!(name: "Donanım Kiti Şablonu Test", company: seller.company)
+    template.template_lines.create!(
+      category: hw_cat, label: "Donanım Kiti", variable: :fixed, fixed_quantity: 1,
+      hardware_schema_lookup: true, hardware_system: "test_sistem", hardware_acilim_tipi: "test_acilim"
+    )
+
+    get new_from_template_sale_path(sale, product_template_id: template.id)
+    assert_response :success
+    assert_match "otomatik seçilip eklenecek", @response.body
+
+    post create_from_template_sale_path(sale), params: {
+      product_template_id: template.id,
+      measurements: { genislik_mm: 500, yukseklik_mm: 1000 }
+    }
+
+    assert_redirected_to items_sale_path(sale)
+    assert_equal 2, sale.sale_lines.count
+    assert_equal 1.0, sale.sale_lines.find_by(product: isp).quantity.to_f
+    assert_equal 2.0, sale.sale_lines.find_by(product: mentese).quantity.to_f
+  end
 end

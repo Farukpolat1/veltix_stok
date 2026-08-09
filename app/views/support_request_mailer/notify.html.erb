@@ -1,7 +1,13 @@
-<p><strong><%= @company_name %></strong> firmasından yeni bir talep geldi:</p>
+<p><strong><%= @support_request.company.name %></strong> firmasından yeni bir
+<strong><%= SupportRequest::CATEGORY_LABELS[@support_request.category] %></strong> geldi:</p>
 <ul>
-  <li><strong>Gönderen:</strong> <%= @user_name %></li>
-  <li><strong>E-posta:</strong> <%= @user_email %></li>
-  <li><strong>Firma:</strong> <%= @company_name %></li>
+  <li><strong>Gönderen:</strong> <%= @support_request.user.display_name %></li>
+  <li><strong>E-posta:</strong> <%= @support_request.user.email_address %></li>
+  <li><strong>Firma:</strong> <%= @support_request.company.name %></li>
+  <li><strong>Kategori:</strong> <%= SupportRequest::CATEGORY_LABELS[@support_request.category] %></li>
 </ul>
-<p><strong>Mesaj:</strong><br><%= simple_format(@message) %></p>
+<p><strong>Mesaj:</strong><br><%= simple_format(@support_request.message) %></p>
+<p>
+  Cevap vermek için uygulamada
+  <%= link_to "Talepler ekranını", support_requests_url %> kullanın.
+</p>

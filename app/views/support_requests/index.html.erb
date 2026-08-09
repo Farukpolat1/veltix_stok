@@ -1,0 +1,6 @@
+<% content_for :title, current_user.super_admin? ? "Talepler" : "Taleplerim" %>
+
+<span class="section-eyebrow mb-2 d-inline-flex"><i class="bi bi-headset"></i> Destek</span>
+<h1 class="h3 mb-3"><%= current_user.super_admin? ? "Gelen Talepler" : "Taleplerim" %></h1>
+
+<%= render "list", requests: @support_requests %>

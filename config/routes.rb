@@ -57,6 +57,13 @@ Rails.application.routes.draw do
     end
   end
 
+  resources :product_templates, except: [ :show ] do
+    member do
+      get :lines
+    end
+    resources :template_lines, only: [ :create, :destroy ], controller: "template_lines"
+  end
+
   resources :purchase_invoices, except: [ :show ] do
     member do
       patch :approve
@@ -83,6 +90,8 @@ Rails.application.routes.draw do
       get :receipt
       post :import_lines_pdf
       post :confirm_import_lines
+      get :new_from_template
+      post :create_from_template
     end
     collection do
       post :new_pdf, action: :create_pdf
@@ -113,7 +122,7 @@ Rails.application.routes.draw do
     end
   end
   resource :profile, only: [ :edit, :update ]
-  resources :support_requests, only: [ :create ]
+  resources :support_requests, only: [ :index, :create, :update ]
   resource :company_settings, only: [ :edit, :update ]
   resources :companies, only: [ :index, :new, :create, :edit, :update, :destroy ] do
     member do

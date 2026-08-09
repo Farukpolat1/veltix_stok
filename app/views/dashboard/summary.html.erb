@@ -36,8 +36,8 @@
     <%= link_to purchase_invoices_path, class: "text-decoration-none" do %>
       <div class="card stat-card stat-card--purchase h-100">
         <div class="card-body">
-          <h2 class="h6 text-muted">Alınan m²</h2>
-          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_purchase_m2, delimiter: ".", separator: ",") %> m²</p>
+          <h2 class="h6 text-muted">Alınan Aksesuar</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_purchase_adet, delimiter: ".", separator: ",") %> adet</p>
         </div>
       </div>
     <% end %>
@@ -70,8 +70,8 @@
     <%= link_to sales_path, class: "text-decoration-none" do %>
       <div class="card stat-card stat-card--sale h-100">
         <div class="card-body">
-          <h2 class="h6 text-muted">Satılan m²</h2>
-          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_sale_m2, delimiter: ".", separator: ",") %> m²</p>
+          <h2 class="h6 text-muted">Satılan Aksesuar</h2>
+          <p class="h3 mb-0 text-dark"><%= number_with_delimiter(@period_sale_adet, delimiter: ".", separator: ",") %> adet</p>
         </div>
       </div>
     <% end %>

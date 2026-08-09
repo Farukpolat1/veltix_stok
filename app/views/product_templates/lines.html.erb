@@ -1,0 +1,99 @@
+<% content_for :title, "#{@product_template.name} — Satırlar" %>
+
+<div class="d-flex justify-content-between align-items-start mb-3">
+  <div>
+    <h1 class="h3 mb-1">Şablon: <%= @product_template.name %></h1>
+    <p class="text-muted small mb-0">Bu şablon satıştan bir kez uygulandığında her satır, aşağıdaki hesaba göre bir malzeme satırı önerir: <code>miktar = (ölçü × katsayı × fire payı) + sabit ekleme</code>. "Sabit Miktar" seçilirse ölçüden bağımsız, doğrudan girilen miktar kullanılır.</p>
+  </div>
+  <%= link_to product_templates_path, class: "btn btn-outline-secondary btn-sm" do %><i class="bi bi-arrow-left"></i> Şablonlara Dön<% end %>
+</div>
+
+<div class="card mb-4">
+  <div class="card-body">
+    <h2 class="h6 mb-3">Satır Ekle</h2>
+    <%= form_with url: product_template_template_lines_path(@product_template), method: :post, scope: :template_line, class: "row g-3 align-items-end" do |f| %>
+      <div class="col-md-3">
+        <%= f.label :label, "Etiket (örn. Kasa Profili)", class: "form-label" %>
+        <%= f.text_field :label, required: true, class: "form-control" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :category_id, "Kategori", class: "form-label" %>
+        <%= f.collection_select :category_id, @categories, :id, :name, { include_blank: "Seçiniz" }, { class: "form-select", required: true } %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :default_product_id, "Varsayılan Ürün (opsiyonel)", class: "form-label" %>
+        <%= f.grouped_collection_select :default_product_id, @categories, :products, :name, :id, :name, { include_blank: "Onay ekranında seçilecek" }, { class: "form-select" } %>
+        <div class="form-text">Kol gibi çok çeşitli kategorilerde boş bırakın — onay ekranında listeden seçilir.</div>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :variable, "Ölçü Türü", class: "form-label" %>
+        <%= f.select :variable, TemplateLine::VARIABLE_LABELS.map { |value, label| [ label, value ] }, { selected: "fixed" }, class: "form-select" %>
+      </div>
+
+      <div class="col-md-3">
+        <%= f.label :fixed_quantity, "Sabit Miktar (Ölçü Türü = Sabit Miktar ise)", class: "form-label" %>
+        <%= f.number_field :fixed_quantity, step: "any", min: 0, class: "form-control" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :coefficient, "Katsayı", class: "form-label" %>
+        <%= f.number_field :coefficient, step: "any", value: 1.0, class: "form-control" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :waste_factor, "Fire Payı (örn. 1.05 = %5 fire)", class: "form-label" %>
+        <%= f.number_field :waste_factor, step: "any", value: 1.0, class: "form-control" %>
+      </div>
+      <div class="col-md-3">
+        <%= f.label :offset_mm, "Sabit Ekleme (mm)", class: "form-label" %>
+        <%= f.number_field :offset_mm, step: "any", value: 0, class: "form-control" %>
+      </div>
+
+      <div class="col-12">
+        <%= f.submit "Satır Ekle", class: "btn btn-success" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <h2 class="h6 mb-3">Mevcut Satırlar</h2>
+    <% if @product_template.template_lines.any? %>
+      <div class="table-responsive">
+        <table class="table table-striped align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Etiket</th>
+              <th>Kategori</th>
+              <th>Varsayılan Ürün</th>
+              <th>Ölçü Türü</th>
+              <th class="text-end">Katsayı</th>
+              <th class="text-end">Fire Payı</th>
+              <th class="text-end">Sabit Ekleme</th>
+              <th class="text-end">Sabit Miktar</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @product_template.template_lines.each do |line| %>
+              <tr>
+                <td><%= line.label %></td>
+                <td><%= line.category.name %></td>
+                <td><%= line.default_product&.name || "—" %></td>
+                <td><%= line.variable_label %></td>
+                <td class="text-end"><%= line.coefficient %></td>
+                <td class="text-end"><%= line.waste_factor %></td>
+                <td class="text-end"><%= line.offset_mm %></td>
+                <td class="text-end"><%= line.fixed_quantity || "—" %></td>
+                <td class="text-end">
+                  <%= button_to "Sil", product_template_template_line_path(@product_template, line), method: :delete, class: "btn btn-sm btn-outline-danger", form: { data: { turbo_confirm: "Satır silinsin mi?" } } %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    <% else %>
+      <p class="text-muted mb-0">Henüz satır eklenmedi.</p>
+    <% end %>
+  </div>
+</div>

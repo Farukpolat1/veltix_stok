@@ -1,17 +1,23 @@
-<% support_request = SupportRequest.new %>
+<% support_request = SupportRequest.new(category: :bug) %>
 <div class="modal fade" id="supportRequestModal" tabindex="-1" aria-labelledby="supportRequestModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="supportRequestModalLabel"><i class="bi bi-headset"></i> Talep Oluştur</h5>
+        <h5 class="modal-title" id="supportRequestModalLabel"><i class="bi bi-headset"></i> Hata Bildir / Talep Oluştur</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
       </div>
       <%= form_with model: support_request, url: support_requests_path do |f| %>
         <div class="modal-body">
           <p class="text-muted small">
-            Mesajınız, <strong><%= current_company&.name %></strong> firması ve
-            <strong><%= current_user.display_name %></strong> bilgileriyle birlikte bize iletilir.
+            Karşılaştığınız bir hatayı bildirin ya da eksik gördüğünüz bir özelliği
+            talep edin. Mesajınız, <strong><%= current_company&.name %></strong> firması
+            ve <strong><%= current_user.display_name %></strong> bilgileriyle birlikte
+            bize iletilir; verilen cevabı "Taleplerim" ekranından takip edebilirsiniz.
           </p>
+          <div class="mb-3">
+            <%= f.label :category, "Tür", class: "form-label" %>
+            <%= f.select :category, SupportRequest.categories.keys.map { |key| [ SupportRequest::CATEGORY_LABELS[key], key ] }, {}, class: "form-select" %>
+          </div>
           <div class="mb-3">
             <%= f.label :subject, "Konu (opsiyonel)", class: "form-label" %>
             <%= f.text_field :subject, class: "form-control" %>

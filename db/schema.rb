@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_30_140606) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_09_080415) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -119,6 +119,40 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140606) do
     t.index ["company_id", "code"], name: "index_customers_on_company_id_and_code", unique: true
     t.index ["company_id", "tax_number"], name: "index_customers_on_company_id_and_tax_number", unique: true
     t.index ["company_id"], name: "index_customers_on_company_id"
+  end
+
+  create_table "hardware_schema_cells", force: :cascade do |t|
+    t.string "acilim_tipi", null: false
+    t.datetime "created_at", null: false
+    t.integer "genislik_max_mm", null: false
+    t.integer "genislik_min_mm", null: false
+    t.string "system", null: false
+    t.datetime "updated_at", null: false
+    t.integer "yukseklik_max_mm", null: false
+    t.integer "yukseklik_min_mm", null: false
+    t.index ["system", "acilim_tipi", "genislik_min_mm", "yukseklik_min_mm"], name: "idx_hw_cells_lookup"
+  end
+
+  create_table "hardware_schema_lines", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "hardware_schema_cell_id", null: false
+    t.bigint "product_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, default: "1.0", null: false
+    t.datetime "updated_at", null: false
+    t.index ["hardware_schema_cell_id"], name: "index_hardware_schema_lines_on_hardware_schema_cell_id"
+    t.index ["product_id"], name: "index_hardware_schema_lines_on_product_id"
+  end
+
+  create_table "product_templates", force: :cascade do |t|
+    t.boolean "active", default: true, null: false
+    t.string "code"
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.datetime "updated_at", null: false
+    t.index ["company_id", "name"], name: "index_product_templates_on_company_id_and_name", unique: true
+    t.index ["company_id"], name: "index_product_templates_on_company_id"
   end
 
   create_table "products", force: :cascade do |t|
@@ -291,6 +325,42 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140606) do
     t.index ["company_id"], name: "index_suppliers_on_company_id"
   end
 
+  create_table "support_requests", force: :cascade do |t|
+    t.integer "category", default: 0, null: false
+    t.bigint "company_id", null: false
+    t.datetime "created_at", null: false
+    t.text "message", null: false
+    t.datetime "replied_at"
+    t.text "reply"
+    t.integer "status", default: 0, null: false
+    t.string "subject"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["company_id"], name: "index_support_requests_on_company_id"
+    t.index ["user_id"], name: "index_support_requests_on_user_id"
+  end
+
+  create_table "template_lines", force: :cascade do |t|
+    t.bigint "category_id", null: false
+    t.decimal "coefficient", precision: 10, scale: 4, default: "1.0", null: false
+    t.datetime "created_at", null: false
+    t.bigint "default_product_id"
+    t.decimal "fixed_quantity", precision: 10, scale: 2
+    t.string "hardware_acilim_tipi"
+    t.boolean "hardware_schema_lookup", default: false, null: false
+    t.string "hardware_system"
+    t.string "label", null: false
+    t.decimal "offset_mm", precision: 10, scale: 2, default: "0.0", null: false
+    t.integer "position", default: 0, null: false
+    t.bigint "product_template_id", null: false
+    t.datetime "updated_at", null: false
+    t.integer "variable", default: 5, null: false
+    t.decimal "waste_factor", precision: 6, scale: 4, default: "1.0", null: false
+    t.index ["category_id"], name: "index_template_lines_on_category_id"
+    t.index ["default_product_id"], name: "index_template_lines_on_default_product_id"
+    t.index ["product_template_id"], name: "index_template_lines_on_product_template_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "company_id", null: false
     t.datetime "confirmed_at"
@@ -322,6 +392,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140606) do
   add_foreign_key "customer_payments", "customers"
   add_foreign_key "customer_payments", "users"
   add_foreign_key "customers", "companies"
+  add_foreign_key "hardware_schema_lines", "hardware_schema_cells"
+  add_foreign_key "hardware_schema_lines", "products"
+  add_foreign_key "product_templates", "companies"
   add_foreign_key "products", "categories"
   add_foreign_key "products", "companies"
   add_foreign_key "purchase_invoice_lines", "products"
@@ -350,6 +423,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_30_140606) do
   add_foreign_key "supplier_product_mappings", "products"
   add_foreign_key "supplier_product_mappings", "suppliers"
   add_foreign_key "suppliers", "companies"
+  add_foreign_key "support_requests", "companies"
+  add_foreign_key "support_requests", "users"
+  add_foreign_key "template_lines", "categories"
+  add_foreign_key "template_lines", "product_templates"
+  add_foreign_key "template_lines", "products", column: "default_product_id"
   add_foreign_key "users", "companies"
   add_foreign_key "warehouses", "companies"
 end

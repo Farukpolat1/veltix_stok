@@ -84,6 +84,7 @@ class SalesController < ApplicationController
   def items
     @products = Product.order(:name)
     @categories = Category.order(:name)
+    @product_templates = ProductTemplate.where(active: true).order(:name)
   end
 
   # Yanlış müşteri/tarih/sipariş no seçilmişse düzeltmek için — sadece
@@ -142,6 +143,80 @@ class SalesController < ApplicationController
       flash.now[:alert] = "Eklenemedi: #{e.message}"
       render :review_import_lines, status: :unprocessable_entity
     end
+  end
+
+  # Şablondan (BOM) satır ekleme — kullanıcı bir ProductTemplate seçer, gerekli
+  # ölçüleri girer ve önerilen (kol gibi çeşidi çok kategorilerde
+  # değiştirilebilir) ürünleri onaylar. Boms::Calculator bkz. app/services/boms/calculator.rb.
+  def new_from_template
+    @sale = Sale.find(params[:id])
+    authorize @sale, :update?
+    @product_template = ProductTemplate.find(params[:product_template_id])
+    template_lines = @product_template.template_lines
+    @measurement_fields = template_lines.reject(&:fixed?).map(&:variable).uniq.map do |variable|
+      [ TemplateLine::MEASUREMENT_KEYS.fetch(variable), TemplateLine::VARIABLE_LABELS.fetch(variable) ]
+    end
+    # hardware_schema_lookup satırları donanım kitini kanadın kendi ham
+    # genişlik/yükseklik ölçüsüne göre seçiyor (bkz. HardwareResolver) —
+    # diğer satırların kullandığı türetilmiş çevre/alan ölçülerinden ayrı.
+    if template_lines.any?(&:hardware_schema_lookup?)
+      @measurement_fields += [ [ :genislik_mm, "Kanat Genişliği (mm)" ], [ :yukseklik_mm, "Kanat Yüksekliği (mm)" ] ]
+    end
+    # Her satır için elle fiyat girmemek adına, o ürünün en son satıştaki
+    # birim fiyatı varsayılan olarak dolduruluyor — kullanıcı sadece
+    # değişmesi gerekeni değiştiriyor.
+    @last_prices = template_lines.each_with_object({}) do |line, prices|
+      next unless line.default_product
+      last_line = SaleLine.where(product_id: line.default_product_id).order(created_at: :desc).first
+      prices[line.id] = last_line&.unit_price
+    end
+  rescue ActiveRecord::RecordNotFound
+    redirect_to items_sale_path(@sale), alert: "Şablon bulunamadı."
+  end
+
+  def create_from_template
+    @sale = Sale.find(params[:id])
+    authorize @sale, :update?
+    product_template = ProductTemplate.find(params[:product_template_id])
+    measurements = params[:measurements]&.to_unsafe_h || {}
+    overrides = (params[:product_ids]&.to_unsafe_h || {}).transform_values(&:presence).compact
+    prices = params[:unit_prices]&.to_unsafe_h || {}
+    vat_rates = params[:vat_rates]&.to_unsafe_h || {}
+
+    results = Boms::Calculator.call(product_template, measurements: measurements, product_overrides: overrides)
+    missing = results.select { |r| r.product.nil? }
+    if missing.any?
+      return redirect_to new_from_template_sale_path(@sale, product_template_id: product_template.id),
+        alert: "Şu satırlar için ürün seçilmedi: #{missing.map { |r| r.template_line.label }.join(', ')}"
+    end
+
+    ActiveRecord::Base.transaction do
+      results.each do |result|
+        # hardware_schema_lookup satırları formda tek bir fiyat alanı olarak
+        # gösterilmiyor (ölçüye göre kaç farklı gerçek ürün çıkacağı önceden
+        # bilinmiyor) — bu satırlarda her parçanın kendi son satış fiyatı
+        # kullanılır, diğer satırlarda formdan gelen fiyat kullanılır.
+        unit_price =
+          if result.template_line.hardware_schema_lookup?
+            SaleLine.where(product_id: result.product.id).order(created_at: :desc).first&.unit_price || 0
+          else
+            prices[result.template_line.id.to_s].presence || 0
+          end
+
+        @sale.sale_lines.create!(
+          product: result.product,
+          quantity: result.quantity,
+          unit_price: unit_price,
+          vat_rate: vat_rates[result.template_line.id.to_s].presence || 20
+        )
+      end
+    end
+
+    redirect_to items_sale_path(@sale), notice: "\"#{product_template.name}\" şablonundan #{results.size} satır eklendi."
+  rescue Boms::Calculator::MissingMeasurementError => e
+    redirect_to new_from_template_sale_path(@sale, product_template_id: product_template.id), alert: e.message
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to items_sale_path(@sale), alert: "Eklenemedi: #{e.record.errors.full_messages.to_sentence}"
   end
 
   # Müşteriden gelen sipariş/ürün listesi PDF'i — Gemini ile okunur, hiçbir

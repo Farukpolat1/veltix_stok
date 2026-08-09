@@ -17,6 +17,7 @@ class ApplicationController < ActionController::Base
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
   before_action :set_tenant_from_current_user
+  before_action :load_recent_support_requests
 
   helper_method :current_user, :current_company, :impersonating?
 
@@ -56,5 +57,19 @@ class ApplicationController < ActionController::Base
 
     def user_not_authorized
       redirect_to root_path, alert: "Bu işlem için yetkiniz yok."
+    end
+
+    # Navbar'daki "Talep Oluştur" düğmesinin yanındaki modal (bkz.
+    # shared/_support_requests_list_modal) her sayfada göründüğü için burada,
+    # tüm authenticated action'lar için hazırlanır. Pundit'in izlenen
+    # policy_scope helper'ı yerine Scope sınıfı doğrudan çağrılıyor — aksi
+    # halde bu yardımcı sorgu, controller'ların KENDİ verify_policy_scoped
+    # kontrolünü (ör. SalesController#index) yanlışlıkla "karşılanmış" gibi
+    # gösterip asıl güvenlik ağını zayıflatırdı.
+    def load_recent_support_requests
+      return unless Current.user
+
+      scope = SupportRequestPolicy::Scope.new(Current.user, SupportRequest).resolve.order(created_at: :desc)
+      @recent_support_requests = Current.user.super_admin? ? scope.pending.limit(5) : scope.limit(5)
     end
 end

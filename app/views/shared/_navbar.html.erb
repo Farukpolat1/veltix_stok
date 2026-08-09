@@ -46,6 +46,7 @@
           <%= link_to "Stok Hareketleri", stock_movements_path, class: sub_tab_class(:stock_movements) %>
           <% if current_user.admin? || current_user.depo? %>
             <%= link_to "Stok Sayımı", stock_adjustments_path, class: sub_tab_class(:stock_adjustments) %>
+            <%= link_to "Şablonlar", product_templates_path, class: sub_tab_class(:product_templates, :template_lines) %>
           <% end %>
         <% when :alis %>
           <%= link_to "Tedarikçiler", suppliers_path, class: sub_tab_class(:suppliers) %>

@@ -71,11 +71,11 @@ class DashboardController < ApplicationController
       @period_purchase_count = stats[:purchase_count]
       @period_purchase_total = stats[:purchase_total]
       @period_purchase_mtul = stats[:purchase_mtul]
-      @period_purchase_m2 = stats[:purchase_m2]
+      @period_purchase_adet = stats[:purchase_adet]
       @period_sale_count = stats[:sale_count]
       @period_sale_total = stats[:sale_total]
       @period_sale_mtul = stats[:sale_mtul]
-      @period_sale_m2 = stats[:sale_m2]
+      @period_sale_adet = stats[:sale_adet]
       @period_customer_payments_total = stats[:customer_payments]
       @period_supplier_payments_total = stats[:supplier_payments]
     end
@@ -132,15 +132,16 @@ class DashboardController < ApplicationController
       {
         stock_in: StockMovement.where(occurred_at: range, direction: :in).sum(:quantity),
         stock_out: StockMovement.where(occurred_at: range, direction: :out).sum(:quantity),
-        # Pencere/pimapen sektöründe iş hacmi "adet" değil, alınan/satılan metretül (profil) ve m² (cam) ile ölçülür.
+        # Pencere/pimapen sektöründe iş hacmi profil (metretül) ve aksesuar
+        # (adet — kol, menteşe, vida, kilit karşılığı vb.) ile ölçülür.
         purchase_count: PurchaseInvoice.approved.where(updated_at: range).count,
         purchase_total: approved_purchase_lines.sum("purchase_invoice_lines.quantity * purchase_invoice_lines.unit_price * (1 + purchase_invoice_lines.vat_rate / 100)"),
         purchase_mtul: approved_purchase_lines.where(products: { unit: :mtul }).sum("purchase_invoice_lines.quantity"),
-        purchase_m2: approved_purchase_lines.where(products: { unit: :m2 }).sum("purchase_invoice_lines.quantity"),
+        purchase_adet: approved_purchase_lines.where(products: { unit: :adet }).sum("purchase_invoice_lines.quantity"),
         sale_count: Sale.approved.where(updated_at: range).count,
         sale_total: approved_sale_lines.sum("sale_lines.quantity * sale_lines.unit_price * (1 + sale_lines.vat_rate / 100)"),
         sale_mtul: approved_sale_lines.where(products: { unit: :mtul }).sum("sale_lines.quantity"),
-        sale_m2: approved_sale_lines.where(products: { unit: :m2 }).sum("sale_lines.quantity"),
+        sale_adet: approved_sale_lines.where(products: { unit: :adet }).sum("sale_lines.quantity"),
         customer_payments: CustomerPayment.where(paid_at: range).sum(:amount),
         supplier_payments: SupplierPayment.where(paid_at: range).sum(:amount),
         pending_purchase_invoices: PurchaseInvoice.pending.count,

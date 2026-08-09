@@ -19,12 +19,14 @@ class Company < ApplicationRecord
   has_many :customer_payments, dependent: :destroy
   has_many :supplier_payments, dependent: :destroy
   has_many :supplier_product_mappings, dependent: :destroy
+  has_many :product_templates, dependent: :destroy
   has_many :products, dependent: :destroy
   has_many :customers, dependent: :destroy
   has_many :suppliers, dependent: :destroy
   has_many :categories, dependent: :destroy
   has_many :category_option_groups, dependent: :destroy
   has_many :warehouses, dependent: :destroy
+  has_many :support_requests, dependent: :destroy
   has_many :users, dependent: :destroy
 
   has_one_attached :logo

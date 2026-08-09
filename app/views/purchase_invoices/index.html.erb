@@ -78,7 +78,7 @@
               <li><%= link_to target_path, class: "dropdown-item" do %><i class="bi bi-eye"></i> <%= invoice.approved? ? "Görüntüle" : "Devam Et" %><% end %></li>
             <% end %>
             <% if policy(invoice).destroy? %>
-              <li><%= button_to purchase_invoice_path(invoice), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+              <li><%= button_to purchase_invoice_path(invoice), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: invoice.approved? ? "Bu fatura onaylanmış — silinirse stok geri alınacak ve tedarikçi bakiyesi güncellenecek. Emin misiniz?" : "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
             <% end %>
           <% end %>
         </td>

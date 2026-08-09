@@ -1,8 +1,11 @@
-<%= @company_name %> firmasından yeni bir talep geldi:
+<%= @support_request.company.name %> firmasından yeni bir <%= SupportRequest::CATEGORY_LABELS[@support_request.category] %> geldi:
 
-Gönderen: <%= @user_name %>
-E-posta: <%= @user_email %>
-Firma: <%= @company_name %>
+Gönderen: <%= @support_request.user.display_name %>
+E-posta: <%= @support_request.user.email_address %>
+Firma: <%= @support_request.company.name %>
+Kategori: <%= SupportRequest::CATEGORY_LABELS[@support_request.category] %>
 
 Mesaj:
-<%= @message %>
+<%= @support_request.message %>
+
+Cevap vermek için: <%= support_requests_url %>

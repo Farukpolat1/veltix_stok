@@ -1,6 +1,3 @@
-<<<<<<< HEAD
-# polat_pencere_stok
-=======
 # Veltix
 
 PVC pencere/kapı ve imalat sektörüne özel, çok kiracılı (multi-tenant) depo,
@@ -113,4 +110,3 @@ bin/kamal deploy  # sonraki deploy'lar
 Sırlar (`RAILS_MASTER_KEY`, `RESEND_API_KEY`, `GEMINI_API_KEY`,
 `SENTRY_DSN`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`) `.kamal/secrets`
 üzerinden enjekte edilir — gerçek değerleri asla repoya commit etmeyin.
->>>>>>> 4f2045c (Veltix projesi ilk gizli sürüm)

@@ -5,7 +5,7 @@ import { Controller } from "@hotwired/stimulus"
 // kategoriyi işaretleyip aramayı hızlandırmak için. Hiçbir kutu işaretli
 // değilse tüm ürünler önerilir.
 export default class extends Controller {
-  static targets = ["checkbox", "datalist"]
+  static targets = ["select", "datalist"]
   static values = { products: Array }
 
   connect() {
@@ -13,7 +13,7 @@ export default class extends Controller {
   }
 
   applyFilter() {
-    const checkedIds = this.checkboxTargets.filter((box) => box.checked).map((box) => box.dataset.categoryId)
+    const checkedIds = Array.from(this.selectTarget.selectedOptions).map((option) => option.value)
     const visible = checkedIds.length === 0
       ? this.productsValue
       : this.productsValue.filter((product) => checkedIds.includes(String(product.categoryId)))

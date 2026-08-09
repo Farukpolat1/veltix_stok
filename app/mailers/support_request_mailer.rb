@@ -1,17 +1,11 @@
 class SupportRequestMailer < ApplicationMailer
-  # deliver_later ile kuyruğa alınabilmesi için serileştirilebilir bir Hash
-  # alır (bkz. SupportRequestsController#create) — anahtarlar string.
-  def notify(attrs)
-    @message = attrs["message"]
-    @user_name = attrs["user_name"]
-    @user_email = attrs["user_email"]
-    @company_name = attrs["company_name"]
-    subject_text = attrs["subject"].presence || "Destek Talebi"
+  def notify(support_request)
+    @support_request = support_request
 
     mail(
-      subject: "[#{@company_name}] #{subject_text}",
+      subject: "[#{support_request.company.name}] #{support_request.subject.presence || SupportRequest::CATEGORY_LABELS[support_request.category]}",
       to: Veltix::CONTACT_EMAIL,
-      reply_to: @user_email
+      reply_to: support_request.user.email_address
     )
   end
 end

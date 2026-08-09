@@ -79,7 +79,7 @@
               <li><%= link_to items_sale_path(sale), class: "dropdown-item" do %><i class="bi bi-eye"></i> <%= sale.approved? ? "Görüntüle" : "Devam Et" %><% end %></li>
             <% end %>
             <% if policy(sale).destroy? %>
-              <li><%= button_to sale_path(sale), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
+              <li><%= button_to sale_path(sale), method: :delete, class: "dropdown-item text-danger", form: { data: { turbo_confirm: sale.approved? ? "Bu satış onaylanmış — silinirse stok geri eklenecek ve müşteri bakiyesi güncellenecek. Emin misiniz?" : "Emin misiniz?" } } do %><i class="bi bi-trash"></i> Sil<% end %></li>
             <% end %>
           <% end %>
         </td>

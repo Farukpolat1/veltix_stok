@@ -70,6 +70,19 @@
       <% end %>
     </div>
   </div>
+
+  <% if @product_templates.any? %>
+    <div class="card mb-3">
+      <div class="card-body">
+        <h2 class="h6 mb-2"><i class="bi bi-diagram-3"></i> Şablondan Ekle (opsiyonel)</h2>
+        <p class="text-muted small mb-2">Pencere/kapı tipini seçin, ölçüleri girin — şablondaki malzemeler önerilir.</p>
+        <%= form_with url: new_from_template_sale_path(@sale), method: :get, class: "d-flex gap-2" do %>
+          <%= select_tag :product_template_id, options_from_collection_for_select(@product_templates, :id, :name), include_blank: "Şablon seçin", class: "form-select" %>
+          <button type="submit" class="btn btn-outline-primary text-nowrap">Devam Et</button>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
 <% end %>
 
 <div class="card">

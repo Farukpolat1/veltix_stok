@@ -1,0 +1,19 @@
+<div class="modal fade" id="supportRequestsListModal" tabindex="-1" aria-labelledby="supportRequestsListModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="supportRequestsListModalLabel">
+          <i class="bi bi-list-check"></i> <%= current_user.super_admin? ? "Bekleyen Talepler" : "Taleplerim" %>
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Kapat"></button>
+      </div>
+      <div class="modal-body">
+        <%= render "support_requests/list", requests: @recent_support_requests %>
+      </div>
+      <div class="modal-footer">
+        <%= link_to "Tümünü Gör", support_requests_path, class: "btn btn-outline-secondary btn-sm" %>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Kapat</button>
+      </div>
+    </div>
+  </div>
+</div>

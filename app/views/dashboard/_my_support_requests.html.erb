@@ -1,0 +1,6 @@
+<button type="button" class="support-request-ball" data-bs-toggle="modal" data-bs-target="#supportRequestsListModal" title="<%= current_user.super_admin? ? "Bekleyen Talepler" : "Taleplerim" %>">
+  <i class="bi bi-headset"></i>
+  <% if @recent_support_requests.any? %>
+    <span class="support-request-ball__count"><%= @recent_support_requests.size %></span>
+  <% end %>
+</button>

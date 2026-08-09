@@ -16,7 +16,7 @@ module ApplicationHelper
   # olduğunu, o an render edilen controller'a bakarak belirler — alt sekme
   # şeridinin (bkz. shared/_navbar) hangi grubu göstereceğini seçer.
   NAV_SECTIONS = {
-    stok: %w[products categories stock_movements stock_adjustments],
+    stok: %w[products categories stock_movements stock_adjustments product_templates template_lines],
     alis: %w[suppliers supplier_payments purchase_invoices purchase_invoice_items],
     satis: %w[customers customer_payments sales sale_items],
     yonetim: %w[users company_settings companies]

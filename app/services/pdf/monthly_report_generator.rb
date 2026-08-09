@@ -27,14 +27,14 @@ module Pdf
           [ "Onaylı Satış Adedi", @stats[:sale_count].to_s ],
           [ "Satış Tutarı", "#{number(@stats[:sale_total])} ₺" ],
           [ "Satılan Metretül", "#{number(@stats[:sale_mtul])} mtül" ],
-          [ "Satılan m²", "#{number(@stats[:sale_m2])} m²" ]
+          [ "Satılan Aksesuar", "#{number(@stats[:sale_adet])} adet" ]
         ])
 
         section(pdf, "Alış", [
           [ "Onaylı Fatura Adedi", @stats[:purchase_count].to_s ],
           [ "Alış Tutarı", "#{number(@stats[:purchase_total])} ₺" ],
           [ "Alınan Metretül", "#{number(@stats[:purchase_mtul])} mtül" ],
-          [ "Alınan m²", "#{number(@stats[:purchase_m2])} m²" ]
+          [ "Alınan Aksesuar", "#{number(@stats[:purchase_adet])} adet" ]
         ])
 
         section(pdf, "Stok Hareketi", [

@@ -102,18 +102,20 @@ tr:
         paid_at: "Ödeme Tarihi"
       supplier_product_mapping:
         external_code: "Tedarikçi Ürün Kodu"
-  # DemoRequest/SupportRequest gibi ActiveRecord olmayan (ActiveModel::Model)
-  # form nesneleri hata mesajı ararken activerecord: değil, activemodel: veya
-  # en sonunda üstteki genel errors: anahtarına bakar — bu yüzden aynı mesajlar
-  # burada da tekrarlanıyor (bkz. errors.messages altında).
+      support_request:
+        subject: "Konu"
+        message: "Mesaj"
+        category: "Kategori"
+  # DemoRequest, ActiveRecord olmayan (ActiveModel::Model) bir form nesnesi —
+  # hata mesajı ararken activerecord: değil, activemodel: veya en sonunda
+  # üstteki genel errors: anahtarına bakar, bu yüzden aynı mesajlar burada da
+  # tekrarlanıyor (bkz. errors.messages altında). SupportRequest artık gerçek
+  # bir ActiveRecord modeli olduğu için üstteki activerecord.attributes içinde.
   activemodel:
     attributes:
       demo_request:
         name: "Ad Soyad"
         email: "E-posta"
-      support_request:
-        subject: "Konu"
-        message: "Mesaj"
   errors:
     format: "%{attribute} %{message}"
     messages:

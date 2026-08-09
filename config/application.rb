@@ -15,7 +15,14 @@ module Veltix
 
   # Demo talepleri, destek talepleri gibi ziyaretçi/müşteri kaynaklı tüm
   # mailler bu adrese düşer (bkz. DemoRequestMailer, SupportRequestMailer).
-  CONTACT_EMAIL = "Vertixmanagement@gmail.com"
+  #
+  # KÜÇÜK HARFLE YAZILMALI: Resend'in sandbox modu (henüz bir alan adı
+  # doğrulanmadığı için, bkz. onboarding@resend.dev) test maillerinin sadece
+  # hesap sahibinin kendi adresine gitmesine izin veriyor ve bu kontrolü
+  # büyük/küçük harfe duyarlı yapıyor — "Vertixmanagement" (büyük V) ile
+  # Resend'in kayıtlı "vertixmanagement" (küçük v) eşleşmediği için mailler
+  # sessizce reddediliyordu (bkz. resend.com/emails hata mesajı).
+  CONTACT_EMAIL = "vertixmanagement@gmail.com"
 
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
