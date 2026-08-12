@@ -22,6 +22,19 @@ class Product < ApplicationRecord
     UNIT_LABELS[unit]
   end
 
+  # Alış faturasında/kataloğunda ve müşteri siparişinde aynı ürün farklı
+  # isimle geçebiliyor (ör. "Ege Lambri 200" alışta, "Kapı Lambrisi" satış
+  # siparişinde) — Products::FindOrCreate ve arama bu alternatif isimlerden
+  # de eşleştirsin diye eklendi. Form'dan virgülle ayrılmış tek metin olarak
+  # girilir, burada diziye çevrilir.
+  def aliases_text
+    Array(aliases).join(", ")
+  end
+
+  def aliases_text=(value)
+    self.aliases = value.to_s.split(",").map { |s| s.strip.presence }.compact
+  end
+
   private
     def generate_code
       base = name.to_s.parameterize(separator: "-").upcase.first(20).sub(/-+\z/, "")

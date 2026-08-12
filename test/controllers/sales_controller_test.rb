@@ -40,6 +40,78 @@ class SalesControllerTest < ActionDispatch::IntegrationTest
     assert_not_equal "SHOULD-NOT-APPLY", sale.reload.external_order_number
   end
 
+  test "insufficient stock blocks approval when company's strict_stock_check is on (default)" do
+    seller = users(:one)
+    seller.update!(role: :admin)
+    seller.company.update!(strict_stock_check: true)
+    sign_in_as seller
+    customer = Customer.create!(name: "Stok Yetersiz Müşteri")
+    product = products(:one)
+    product.update!(stock_quantity: 0)
+    sale = Sale.create!(sale_date: Date.current, customer: customer, created_by: seller)
+    sale.sale_lines.create!(product: product, quantity: 5, unit_price: 10, vat_rate: 20)
+
+    patch approve_sale_path(sale)
+
+    assert_redirected_to items_sale_path(sale)
+    assert sale.reload.pending?
+  end
+
+  test "insufficient stock does not block approval when company's strict_stock_check is off" do
+    seller = users(:one)
+    seller.update!(role: :admin)
+    seller.company.update!(strict_stock_check: false)
+    sign_in_as seller
+    customer = Customer.create!(name: "Stok Kontrolsüz Müşteri")
+    product = products(:one)
+    product.update!(stock_quantity: 0)
+    sale = Sale.create!(sale_date: Date.current, customer: customer, created_by: seller)
+    sale.sale_lines.create!(product: product, quantity: 5, unit_price: 10, vat_rate: 20)
+
+    patch approve_sale_path(sale)
+
+    assert_redirected_to sales_path
+    assert sale.reload.approved?
+    assert_equal(-5, product.reload.stock_quantity)
+  end
+
+  test "deleting an approved sale reverses the stock movement and restores stock_quantity" do
+    seller = users(:one)
+    seller.update!(role: :admin)
+    sign_in_as seller
+    customer = Customer.create!(name: "Silinen Satış Müşterisi")
+    product = products(:one)
+    product.update!(stock_quantity: 10)
+    sale = Sale.create!(sale_date: Date.current, customer: customer, created_by: seller)
+    sale.sale_lines.create!(product: product, quantity: 3, unit_price: 10, vat_rate: 20)
+    sale.approve!(user: seller)
+    assert_equal 7, product.reload.stock_quantity
+
+    delete sale_path(sale)
+
+    assert_redirected_to sales_path
+    assert_equal 10, product.reload.stock_quantity
+    assert_not Sale.exists?(sale.id)
+  end
+
+  test "satis role cannot delete an approved sale" do
+    seller = users(:one)
+    seller.update!(role: :satis)
+    sign_in_as seller
+    customer = Customer.create!(name: "Yetkisiz Silme Müşterisi")
+    product = products(:one)
+    product.update!(stock_quantity: 10)
+    sale = Sale.create!(sale_date: Date.current, customer: customer, created_by: seller)
+    sale.sale_lines.create!(product: product, quantity: 1, unit_price: 10, vat_rate: 20)
+    admin = User.create!(email_address: "gecici_admin@example.com", password: "sifre1234", role: :admin, company: seller.company, confirmed_at: Time.current)
+    sale.approve!(user: admin)
+
+    delete sale_path(sale)
+
+    assert_redirected_to root_path
+    assert Sale.exists?(sale.id)
+  end
+
   test "adding lines from a product template computes quantities and respects product overrides" do
     seller = users(:one)
     seller.update!(role: :admin)

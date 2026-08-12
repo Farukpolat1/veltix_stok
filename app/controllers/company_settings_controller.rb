@@ -20,6 +20,6 @@ class CompanySettingsController < ApplicationController
 
   private
     def company_params
-      params.expect(company: [ :name, :slogan, :address, :phone, :website, :email, :tax_number, :tax_office, :logo ])
+      params.expect(company: [ :name, :slogan, :address, :phone, :website, :email, :tax_number, :tax_office, :logo, :strict_stock_check ])
     end
 end

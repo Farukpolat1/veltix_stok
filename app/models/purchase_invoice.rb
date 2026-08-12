@@ -13,6 +13,18 @@ class PurchaseInvoice < ApplicationRecord
   validates :invoice_date, presence: true
   validates :ubl_uuid, uniqueness: { scope: :company_id }, allow_blank: true
 
+  # Onaylı bir fatura silinirse (bkz. PurchaseInvoicePolicy#destroy?, sadece
+  # admin/süper admin), stoğa eklenmiş miktarların geri alınması gerekir —
+  # aksi halde StockMovement kaydı cascade ile silinir ama
+  # Product#stock_quantity yanlış (fazla) kalır. Tedarikçi bakiyesi
+  # (Supplier#balance) ise total_purchased'ı canlı hesapladığı için fatura
+  # satırları silinince kendiliğinden düzelir, ayrıca bir şey yapmaya gerek yok.
+  # prepend: true şart — aksi halde has_many :purchase_invoice_lines,
+  # dependent: :destroy kendi before_destroy'unu (satırları/stok
+  # hareketlerini siler) bu callback'ten ÖNCE çalıştırır, biz stoğu geri
+  # almaya çalıştığımızda purchase_invoice_lines zaten silinmiş olur.
+  before_destroy :reverse_stock_movements, if: :approved?, prepend: true
+
   # Hiç satırı yoksa ya da eşleşmemiş (product_id boş) satır varsa fatura onaylanamaz.
   def approvable?
     pending? && purchase_invoice_lines.any? && purchase_invoice_lines.where(product_id: nil).none?
@@ -42,4 +54,14 @@ class PurchaseInvoice < ApplicationRecord
       update!(status: :approved)
     end
   end
+
+  private
+    def reverse_stock_movements
+      purchase_invoice_lines.includes(:product, :stock_movement).each do |line|
+        movement = line.stock_movement
+        next unless movement && line.product
+        delta = movement.in? ? -movement.quantity : movement.quantity
+        line.product.increment!(:stock_quantity, delta)
+      end
+    end
 end

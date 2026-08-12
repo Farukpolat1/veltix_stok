@@ -25,7 +25,8 @@ module Products
     def call
       raise ArgumentError, "Ürün adı boş olamaz" if @name.blank?
 
-      existing = Product.find_by("lower(name) = ?", @name.downcase)
+      existing = Product.find_by("lower(name) = ?", @name.downcase) ||
+        Product.where("EXISTS (SELECT 1 FROM unnest(aliases) a WHERE lower(a) = ?)", @name.downcase).first
       return existing if existing
 
       category_id = @category_id.presence || (@fallback_to_default && default_category.id)

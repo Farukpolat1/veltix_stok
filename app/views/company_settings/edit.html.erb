@@ -67,6 +67,15 @@
   </div>
 
   <div class="col-12">
+    <hr>
+    <div class="form-check form-switch">
+      <%= f.check_box :strict_stock_check, class: "form-check-input" %>
+      <%= f.label :strict_stock_check, "Satışta stok kontrolü zorunlu olsun", class: "form-check-label" %>
+    </div>
+    <div class="form-text">Kapatırsanız, stokta yeterli miktar olmasa (hatta 0 olsa) bile satış tamamlanabilir — yeni başlayan veya henüz tam sayım yapmamış firmalar için. Açıksa (varsayılan), stok yetersizse satış tamamlanamaz.</div>
+  </div>
+
+  <div class="col-12">
     <%= f.submit "Kaydet", class: "btn btn-primary" %>
   </div>
 <% end %>

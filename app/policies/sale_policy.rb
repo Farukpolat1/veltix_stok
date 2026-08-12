@@ -8,7 +8,10 @@ class SalePolicy < ApplicationPolicy
   def items? = user.admin? || user.satis?
   def receipt? = user.admin? || user.satis?
   def approve? = (user.admin? || user.satis?) && record.pending?
-  def destroy? = user.admin? && record.pending?
+  # Onaylı bir satışın silinmesi stoğu ve müşteri bakiyesini etkiler (bkz.
+  # Sale#reverse_stock_movements) — bu yüzden beklemedeki satışların aksine
+  # sadece admin/süper admin yapabilir, satış rolü yapamaz.
+  def destroy? = user.admin? || user.super_admin?
 
   class Scope < Scope
     def resolve

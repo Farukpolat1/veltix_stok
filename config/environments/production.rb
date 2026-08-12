@@ -26,14 +26,16 @@ Rails.application.configure do
   # halde her deploy/restart'ta container'ın diskiyle birlikte kaybolabilirler.
   config.active_storage.service = :amazon
 
-  # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  # config.assume_ssl = true
+  # Render, SSL'i kendi reverse proxy'sinde sonlandırıp uygulamaya düz HTTP
+  # olarak iletiyor — bu ikisi açık olmadan hem oturum çerezleri güvensiz
+  # (secure: false) kalır hem de mail linkleri yanlışlıkla http:// üretebilir.
+  config.assume_ssl = true
+  config.force_ssl = true
 
-  # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  # config.force_ssl = true
-
-  # Skip http-to-https redirect for the default health check endpoint.
-  # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
+  # Health check endpoint'i (Render'ın "/up" ile canlılık kontrolü yaptığı
+  # yer) https yönlendirmesinden muaf tutulmalı, aksi halde 301 dönüp
+  # Render'ı yanıltabilir.
+  config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
   # Log to STDOUT with the current request id as a default log tag.
   config.log_tags = [ :request_id ]
@@ -69,7 +71,7 @@ Rails.application.configure do
     address: "smtp.resend.com",
     port: 587,
     user_name: "resend",
-    password: ENV.fetch("RESEND_API_KEY"),
+    password: ENV.fetch("RESEND_API_KEY", nil),
     authentication: :plain,
     enable_starttls_auto: true
   }

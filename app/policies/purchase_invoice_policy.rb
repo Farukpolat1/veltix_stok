@@ -8,7 +8,10 @@ class PurchaseInvoicePolicy < ApplicationPolicy
   def receipt? = user.admin? || user.depo?
   def update? = (user.admin? || user.depo?) && record.pending?
   def approve? = (user.admin? || user.depo?) && record.pending?
-  def destroy? = user.admin? && record.pending?
+  # Onaylı bir faturanın silinmesi stoğu ve tedarikçi bakiyesini etkiler
+  # (bkz. PurchaseInvoice#reverse_stock_movements) — bu yüzden beklemedeki
+  # faturaların aksine sadece admin/süper admin yapabilir, depo rolü yapamaz.
+  def destroy? = user.admin? || user.super_admin?
 
   class Scope < Scope
     def resolve

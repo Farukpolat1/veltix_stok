@@ -139,10 +139,14 @@
       <% if @sale.sale_lines.none? %>
         <p class="text-danger mt-2 mb-0">Tamamlamak için en az bir ürün eklemelisiniz.</p>
       <% elsif @sale.insufficient_stock_lines.any? %>
-        <p class="text-danger mt-2 mb-0">
-          Şu ürünlerin stoğu yetersiz, tamamlamadan önce stok girin:
+        <p class="<%= current_company.strict_stock_check? ? "text-danger" : "text-warning" %> mt-2 mb-0">
+          <% if current_company.strict_stock_check? %>
+            Şu ürünlerin stoğu yetersiz, tamamlamadan önce stok girin:
+          <% else %>
+            <i class="bi bi-exclamation-triangle"></i> Şu ürünlerin stoğu yetersiz görünüyor ama stok kontrolü kapalı olduğu için yine de tamamlayabilirsiniz:
+          <% end %>
           <% @sale.insufficient_stock_lines.each do |l| %>
-            <%= link_to l.product.name, new_stock_adjustment_path(product_id: l.product_id), class: "link-danger" %><%= ", " unless l == @sale.insufficient_stock_lines.last %>
+            <%= link_to l.product.name, new_stock_adjustment_path(product_id: l.product_id), class: current_company.strict_stock_check? ? "link-danger" : "link-warning" %><%= ", " unless l == @sale.insufficient_stock_lines.last %>
           <% end %>
         </p>
       <% end %>
