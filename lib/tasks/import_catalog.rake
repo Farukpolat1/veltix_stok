@@ -12,6 +12,16 @@ namespace :catalog do
     company = Company.find_or_create_by!(name: company_name)
 
     ActsAsTenant.with_tenant(company) do
+      # Her deploy'da (bkz. bin/docker-entrypoint) otomatik çalıştırılıyor —
+      # Render'ın ücretsiz planında Shell/One-Off Jobs olmadığı için tek
+      # güvenilir yol bu. Katalog zaten yüklenmişse (1000+ ürün) her CSV
+      # satırını tekrar tekrar işlemek soğuk başlangıcı yavaşlatmasın diye
+      # erken çıkılıyor.
+      if Product.count >= 1000
+        puts "catalog:import_full_catalog — zaten yüklü (#{Product.count} ürün), atlanıyor."
+        next
+      end
+
       created_categories = 0
       updated_categories = 0
       CSV.foreach(Rails.root.join("db/data/categories_export.csv"), headers: true) do |row|

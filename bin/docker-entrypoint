@@ -7,6 +7,14 @@ if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   # (bkz. config/database.yml) db:prepare, cache/queue/cable tablolarını
   # sessizce atlıyor — bkz. lib/tasks/ensure_shared_databases.rake.
   ./bin/rails db:ensure_shared_databases_prepared
+  # Firma + Marka/Renk/Aksesuar Alt Türü/Seri seçenek listeleri (idempotent).
+  ./bin/rails db:seed
+  # Gerçek ürün kataloğu + müşteri listesi — Render'ın ücretsiz planında
+  # Shell/One-Off Jobs olmadığı için elle çalıştırılamıyor, bu yüzden burada
+  # otomatik (bkz. lib/tasks/import_catalog.rake, import_customers.rake —
+  # ikisi de veri zaten yüklüyse hızlıca atlar, tekrar tekrar güvenli).
+  ./bin/rails catalog:import_full_catalog
+  ./bin/rails customers:import_cari
 fi
 
 exec "${@}"

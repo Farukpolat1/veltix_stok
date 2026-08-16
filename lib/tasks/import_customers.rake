@@ -11,6 +11,14 @@ namespace :customers do
     updated = 0
 
     ActsAsTenant.with_tenant(company) do
+      # Her deploy'da (bkz. bin/docker-entrypoint) otomatik çalıştırılıyor —
+      # bkz. catalog:import_full_catalog'daki aynı gerekçe (Render'ın ücretsiz
+      # planında Shell/One-Off Jobs yok).
+      if Customer.count >= 700
+        puts "customers:import_cari — zaten yüklü (#{Customer.count} müşteri), atlanıyor."
+        next
+      end
+
       CSV.foreach(path, headers: true) do |row|
         customer = Customer.find_or_initialize_by(code: row["code"])
         customer.name = row["name"]
