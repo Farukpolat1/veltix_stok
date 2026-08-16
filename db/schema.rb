@@ -10,9 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_16_090000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_16_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+  enable_extension "pg_trgm"
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
@@ -174,6 +175,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_16_090000) do
     t.index ["color"], name: "index_products_on_color"
     t.index ["company_id", "code"], name: "index_products_on_company_id_and_code", unique: true
     t.index ["company_id"], name: "index_products_on_company_id"
+    t.index ["name"], name: "index_products_on_name_trigram", opclass: :gin_trgm_ops, using: :gin
   end
 
   create_table "purchase_invoice_lines", force: :cascade do |t|

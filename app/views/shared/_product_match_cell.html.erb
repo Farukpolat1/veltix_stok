@@ -1,0 +1,9 @@
+<%# locals: field_name (ör. "sale[lines][][matched_product_id]"), match ({ exact:, suggestions: }) %>
+<% if match[:exact] %>
+  <div class="small text-success"><i class="bi bi-check-circle"></i> <%= match[:exact].name %></div>
+<% elsif match[:suggestions].present? %>
+  <%= select_tag field_name, options_for_select([ [ "Yeni ürün oluştur", "" ] ] + match[:suggestions].map { |p| [ "#{p.name} (#{p.code})", p.id ] }), id: nil, class: "form-select form-select-sm" %>
+  <div class="form-text mb-0">Bu isim eşleşmedi, benzer ürün bulundu</div>
+<% else %>
+  <span class="small text-muted">Yeni ürün oluşturulacak</span>
+<% end %>

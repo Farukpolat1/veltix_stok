@@ -83,16 +83,18 @@
             <tr>
               <th style="width:120px">Ürün Kodu</th>
               <th>Ürün Adı</th>
+              <th style="width:220px">Ürün Eşleştirme</th>
               <th style="width:110px">Miktar</th>
               <th style="width:140px">Birim Fiyat</th>
               <th style="width:100px">KDV %</th>
             </tr>
           </thead>
           <tbody>
-            <% Array(@data[:lines]).each do |line| %>
+            <% Array(@data[:lines]).each_with_index do |line, i| %>
               <tr>
                 <td data-edit-tracker-target="wrapper"><%= text_field_tag "purchase_invoice[lines][][code]", line[:code], id: nil, class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
                 <td data-edit-tracker-target="wrapper"><%= text_field_tag "purchase_invoice[lines][][name]", line[:name], id: nil, class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
+                <td><%= render "shared/product_match_cell", field_name: "purchase_invoice[lines][][matched_product_id]", match: @line_matches&.[](i) || { exact: nil, suggestions: [] } %></td>
                 <td data-edit-tracker-target="wrapper"><%= number_field_tag "purchase_invoice[lines][][quantity]", line[:quantity], id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
                 <td data-edit-tracker-target="wrapper"><%= number_field_tag "purchase_invoice[lines][][unit_price]", line[:unit_price], id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>
                 <td data-edit-tracker-target="wrapper"><%= number_field_tag "purchase_invoice[lines][][vat_rate]", line[:vat_rate] || 20, id: nil, step: "any", class: "form-control form-control-sm", data: { edit_tracker_target: "field", action: "input->edit-tracker#check" } %><span class="badge bg-warning-subtle text-warning-emphasis d-none" data-edit-tracker-target="badge">değişti</span></td>

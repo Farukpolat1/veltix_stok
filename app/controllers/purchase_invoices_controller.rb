@@ -1,4 +1,6 @@
 class PurchaseInvoicesController < ApplicationController
+  include ProductMatchSuggestions
+
   SORT_COLUMNS = %w[invoice_number invoice_date status].freeze
 
   before_action :set_purchase_invoice, only: %i[ edit update destroy approve items receipt ]
@@ -93,6 +95,7 @@ class PurchaseInvoicesController < ApplicationController
       @data = Invoices::PdfImporter.new(bytes).extract
       @pdf_blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new(bytes), filename: file.original_filename.presence || "belge.pdf", content_type: "application/pdf")
       @matched_supplier = find_matching_supplier(@data[:supplier])
+      @line_matches = build_line_matches(@data[:lines])
       render :review_pdf
     rescue Invoices::PdfImporter::ParseError => e
       @purchase_invoice = PurchaseInvoice.new
@@ -115,6 +118,7 @@ class PurchaseInvoicesController < ApplicationController
       @data = data
       @pdf_blob = pdf_blob
       @matched_supplier = find_matching_supplier(data[:supplier])
+      @line_matches = build_line_matches(data[:lines])
       flash.now[:alert] = "Kaydedilemedi: #{e.message}"
       render :review_pdf, status: :unprocessable_entity
     end
@@ -174,6 +178,7 @@ class PurchaseInvoicesController < ApplicationController
       bytes = file.read
       @data = Invoices::PdfImporter.new(bytes).extract
       @pdf_blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new(bytes), filename: file.original_filename.presence || "belge.pdf", content_type: "application/pdf")
+      @line_matches = build_line_matches(@data[:lines])
       render :review_import_lines
     rescue Invoices::PdfImporter::ParseError => e
       redirect_to items_purchase_invoice_path(@purchase_invoice), alert: e.message
@@ -183,7 +188,7 @@ class PurchaseInvoicesController < ApplicationController
   def confirm_import_lines
     @purchase_invoice = PurchaseInvoice.find(params[:id])
     authorize @purchase_invoice, :update?
-    raw = params.require(:purchase_invoice).permit(:pdf_blob_signed_id, lines: [ :code, :name, :quantity, :unit_price, :vat_rate ])
+    raw = params.require(:purchase_invoice).permit(:pdf_blob_signed_id, lines: [ :code, :name, :quantity, :unit_price, :vat_rate, :matched_product_id ])
     lines = (raw[:lines] || []).map { |line| line.to_h.symbolize_keys }
 
     begin
@@ -193,6 +198,7 @@ class PurchaseInvoicesController < ApplicationController
       redirect_to items_purchase_invoice_path(@purchase_invoice), notice: "Satırlar eklendi."
     rescue Invoices::PdfImporter::ParseError, ActiveRecord::RecordInvalid => e
       @data = { lines: lines }
+      @line_matches = build_line_matches(lines)
       @pdf_blob = ActiveStorage::Blob.find_signed(raw[:pdf_blob_signed_id])
       flash.now[:alert] = "Eklenemedi: #{e.message}"
       render :review_import_lines, status: :unprocessable_entity
@@ -309,7 +315,7 @@ class PurchaseInvoicesController < ApplicationController
       raw = params.require(:purchase_invoice).permit(
         :invoice_number, :invoice_date,
         supplier: [ :name, :tax_number, :tax_office, :address, :phone ],
-        lines: [ :code, :name, :quantity, :unit_price, :vat_rate ]
+        lines: [ :code, :name, :quantity, :unit_price, :vat_rate, :matched_product_id ]
       )
 
       {

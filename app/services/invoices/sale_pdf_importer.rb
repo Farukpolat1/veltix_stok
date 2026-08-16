@@ -188,7 +188,7 @@ module Invoices
         # müşterilerin belgelerinde aynı kod farklı ürünlere ait olabilir,
         # bizim code alanımız unique olduğu için çakışma riski var. Eşleşme
         # isimle yapılıyor, iç kod Product'ın kendi otomatik üretimine bırakılır.
-        product = Products::FindOrCreate.call(name: name, unit: unit, fallback_to_default: true)
+        product = Products::FindOrCreate.call(name: name, unit: unit, fallback_to_default: true, product_id: line_data[:matched_product_id])
         @newly_created_products << product.name if product.previously_new_record?
 
         sale.sale_lines.create!(

@@ -10,23 +10,35 @@ module Products
 
     # fallback_to_default: true ise kategori verilmediğinde hata fırlatmak yerine
     # "Sınıflandırılmamış" kategorisini kullanır (örn. toplu/otomatik ekleme akışlarında).
-    def self.call(name:, category_id: nil, unit: nil, code: nil, fallback_to_default: false)
-      new(name: name, category_id: category_id, unit: unit, code: code, fallback_to_default: fallback_to_default).call
+    #
+    # product_id: PDF önizleme ekranında kullanıcı "bu isim aslında şu mevcut
+    # ürün" diye bir öneriyi seçtiyse geçirilir — isim eşleşmesi hiç denenmez,
+    # doğrudan o ürün kullanılır ve okunan isim (zaten alias/ad değilse) o
+    # ürüne alias olarak eklenir; böylece aynı isim bir sonraki belgede otomatik
+    # eşleşir, kullanıcıya bir daha sorulmaz.
+    def self.call(name:, category_id: nil, unit: nil, code: nil, fallback_to_default: false, product_id: nil)
+      new(name: name, category_id: category_id, unit: unit, code: code, fallback_to_default: fallback_to_default, product_id: product_id).call
     end
 
-    def initialize(name:, category_id: nil, unit: nil, code: nil, fallback_to_default: false)
+    def initialize(name:, category_id: nil, unit: nil, code: nil, fallback_to_default: false, product_id: nil)
       @name = name.to_s.strip
       @category_id = category_id
       @unit = unit
       @code = code.to_s.strip.presence
       @fallback_to_default = fallback_to_default
+      @product_id = product_id.presence
     end
 
     def call
       raise ArgumentError, "Ürün adı boş olamaz" if @name.blank?
 
-      existing = Product.find_by("lower(name) = ?", @name.downcase) ||
-        Product.where("EXISTS (SELECT 1 FROM unnest(aliases) a WHERE lower(a) = ?)", @name.downcase).first
+      if @product_id
+        product = Product.find(@product_id)
+        product.update!(aliases: (Array(product.aliases) + [ @name ]).uniq) unless product.name_or_alias_matches?(@name)
+        return product
+      end
+
+      existing = Product.match_by_name_or_alias(@name)
       return existing if existing
 
       category_id = @category_id.presence || (@fallback_to_default && default_category.id)

@@ -336,4 +336,40 @@ class PdfReviewFlowTest < ActionDispatch::IntegrationTest
     end
     assert_redirected_to items_purchase_invoice_path(invoice)
   end
+
+  test "sale pdf import suggests a similarly-named existing product instead of always creating a new one" do
+    seller = users(:one)
+    seller.update!(role: :admin)
+    sign_in_as seller
+    lambri = products(:one)
+    lambri.update!(name: "Ege Lambri 200 (Beyaz)")
+
+    extracted = {
+      customer: { name: "Lambri Müşterisi" }, sale_date: "2026-07-20",
+      # Alışta ve satışta aynı ürün farklı isimle geçiyor — tam eşleşme yok
+      # ama trigram benzerliği yüksek, öneri listesinde çıkmalı.
+      lines: [ { name: "Kapı Lambrisi", quantity: 2, unit: "adet", unit_price: 10, vat_rate: 20 } ]
+    }
+
+    stub_gemini_extraction(extracted) do
+      post new_pdf_sales_path, params: { sale: { pdf_file: fixture_file_upload("dummy.pdf", "application/pdf") } }
+    end
+    assert_response :success
+    assert_select "select[name='sale[lines][][matched_product_id]']" do
+      assert_select "option[value=?]", lambri.id.to_s
+    end
+
+    assert_no_difference "Product.count" do
+      post confirm_pdf_sales_path, params: {
+        sale: {
+          sale_date: "2026-07-20", customer: { name: "Lambri Müşterisi" },
+          lines: [ { name: "Kapı Lambrisi", quantity: "2", unit: "adet", unit_price: "10", vat_rate: "20", matched_product_id: lambri.id } ]
+        }
+      }
+    end
+
+    sale = Sale.order(:created_at).last
+    assert_equal lambri, sale.sale_lines.first.product
+    assert_includes lambri.reload.aliases, "Kapı Lambrisi"
+  end
 end

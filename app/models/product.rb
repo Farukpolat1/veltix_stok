@@ -43,6 +43,30 @@ class Product < ApplicationRecord
     self.aliases = value.to_s.split(",").map { |s| s.strip.presence }.compact
   end
 
+  def name_or_alias_matches?(text)
+    return false if text.blank?
+    name.to_s.casecmp?(text.to_s.strip) || Array(aliases).any? { |a| a.casecmp?(text.to_s.strip) }
+  end
+
+  # Ad veya alternatif isimlerden (aliases) BİREBİR eşleşme — Products::FindOrCreate
+  # önce bunu dener, bulursa yeni ürün açmaz.
+  def self.match_by_name_or_alias(name)
+    return nil if name.blank?
+    find_by("lower(name) = ?", name.downcase) ||
+      where("EXISTS (SELECT 1 FROM unnest(aliases) a WHERE lower(a) = ?)", name.downcase).first
+  end
+
+  # Birebir eşleşme yoksa, PDF önizleme ekranında kullanıcıya "bunu mu
+  # demiştiniz?" diye sormak için pg_trgm ile benzer isimli ürünleri bulur
+  # (ör. alışta "Ege Lambri 200 (Beyaz)", satışta "Kapı Lambrisi" — ikisi de
+  # trigram benzerliğiyle önerilebilir; kullanıcı seçerse alias otomatik eklenir).
+  def self.suggest_matches(text, limit: 5, threshold: 0.2)
+    return none if text.blank?
+    where("similarity(name, ?) > ?", text, threshold)
+      .order(Arel.sql("similarity(name, #{connection.quote(text)}) DESC"))
+      .limit(limit)
+  end
+
   private
     def generate_code
       base = name.to_s.parameterize(separator: "-").upcase.first(20).sub(/-+\z/, "")

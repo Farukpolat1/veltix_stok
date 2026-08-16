@@ -164,7 +164,7 @@ module Invoices
           # kullanabilir, bizim code alanımız unique olduğu için çakışma riski var.
           # Eşleştirme zaten SupplierProductMapping ile (supplier_id + external_code)
           # yapılıyor; iç kod Product'ın kendi otomatik üretimine bırakılır.
-          product = Products::FindOrCreate.call(name: name, fallback_to_default: true)
+          product = Products::FindOrCreate.call(name: name, fallback_to_default: true, product_id: line_data[:matched_product_id])
           product_id = product.id
           SupplierProductMapping.find_or_create_by!(supplier_id: supplier.id, external_code: code) do |m|
             m.external_name = name

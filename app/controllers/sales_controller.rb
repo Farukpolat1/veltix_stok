@@ -1,4 +1,6 @@
 class SalesController < ApplicationController
+  include ProductMatchSuggestions
+
   SORT_COLUMNS = %w[sale_number sale_date status].freeze
 
   before_action :set_sale, only: %i[ destroy approve items receipt edit update ]
@@ -117,6 +119,7 @@ class SalesController < ApplicationController
       bytes = file.read
       @data = Invoices::SalePdfImporter.new(bytes).extract
       @pdf_blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new(bytes), filename: file.original_filename.presence || "belge.pdf", content_type: "application/pdf")
+      @line_matches = build_line_matches(@data[:lines])
       render :review_import_lines
     rescue Invoices::SalePdfImporter::ParseError => e
       redirect_to items_sale_path(@sale), alert: e.message
@@ -126,7 +129,7 @@ class SalesController < ApplicationController
   def confirm_import_lines
     @sale = Sale.find(params[:id])
     authorize @sale, :update?
-    raw = params.require(:sale).permit(:discount_rate, :pdf_blob_signed_id, lines: [ :name, :quantity, :unit, :unit_price, :vat_rate ])
+    raw = params.require(:sale).permit(:discount_rate, :pdf_blob_signed_id, lines: [ :name, :quantity, :unit, :unit_price, :vat_rate, :matched_product_id ])
     lines = (raw[:lines] || []).map { |line| line.to_h.symbolize_keys }
 
     begin
@@ -139,6 +142,7 @@ class SalesController < ApplicationController
       redirect_to items_sale_path(@sale), notice: notice
     rescue Invoices::SalePdfImporter::ParseError, ActiveRecord::RecordInvalid => e
       @data = { lines: lines, discount_rate: raw[:discount_rate] }
+      @line_matches = build_line_matches(lines)
       @pdf_blob = ActiveStorage::Blob.find_signed(raw[:pdf_blob_signed_id])
       flash.now[:alert] = "Eklenemedi: #{e.message}"
       render :review_import_lines, status: :unprocessable_entity
@@ -238,6 +242,7 @@ class SalesController < ApplicationController
       @data = Invoices::SalePdfImporter.new(bytes).extract
       @pdf_blob = ActiveStorage::Blob.create_and_upload!(io: StringIO.new(bytes), filename: file.original_filename.presence || "belge.pdf", content_type: "application/pdf")
       @matched_customer = find_matching_customer(@data[:customer])
+      @line_matches = build_line_matches(@data[:lines])
       render :review_pdf
     rescue Invoices::SalePdfImporter::ParseError => e
       @sale = Sale.new
@@ -266,6 +271,7 @@ class SalesController < ApplicationController
       @data = data
       @pdf_blob = pdf_blob
       @matched_customer = find_matching_customer(data[:customer])
+      @line_matches = build_line_matches(data[:lines])
       flash.now[:alert] = "Kaydedilemedi: #{e.message}"
       render :review_pdf, status: :unprocessable_entity
     end
@@ -357,7 +363,7 @@ class SalesController < ApplicationController
       raw = params.require(:sale).permit(
         :sale_date, :order_number, :discount_rate,
         customer: [ :code, :name, :tax_number, :tax_office, :address, :phone ],
-        lines: [ :name, :quantity, :unit, :unit_price, :vat_rate ]
+        lines: [ :name, :quantity, :unit, :unit_price, :vat_rate, :matched_product_id ]
       )
 
       {
