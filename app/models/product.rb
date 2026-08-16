@@ -65,6 +65,11 @@ class Product < ApplicationRecord
     where("similarity(name, ?) > ?", text, threshold)
       .order(Arel.sql("similarity(name, #{connection.quote(text)}) DESC"))
       .limit(limit)
+  rescue ActiveRecord::StatementInvalid
+    # pg_trgm bazı ortamlarda (izin kısıtlı yönetilen Postgres) etkinleştirilemeyebilir
+    # (bkz. ilgili migration'daki rescue) — bu durumda öneri sessizce boş döner,
+    # sistem "yeni ürün oluşturulacak" davranışına düşer, hiçbir yeri kilitlemez.
+    none
   end
 
   private
