@@ -22,9 +22,11 @@ Rails.application.configure do
   # config.asset_host = "http://assets.example.com"
 
   # Yüklenen fatura PDF'leri/ürün görselleri container'ın kendi diskinde değil
-  # S3'te (bkz. config/storage.yml, AWS_* env değişkenleri) tutulur — aksi
-  # halde her deploy/restart'ta container'ın diskiyle birlikte kaybolabilirler.
-  config.active_storage.service = :amazon
+  # bulut depolamada (bkz. config/storage.yml, STORAGE_* env değişkenleri)
+  # tutulur — aksi halde her deploy/restart'ta container'ın diskiyle birlikte
+  # kaybolabilirler. S3, Cloudflare R2, Backblaze B2 — hangisini kullandığınız
+  # sadece STORAGE_ENDPOINT'e bağlı, kod tarafında fark yok.
+  config.active_storage.service = :cloud
 
   # Render, SSL'i kendi reverse proxy'sinde sonlandırıp uygulamaya düz HTTP
   # olarak iletiyor — bu ikisi açık olmadan hem oturum çerezleri güvensiz

@@ -7,14 +7,22 @@ local:
   root: <%= Rails.root.join("storage") %>
 
 # Production — GEMINI_API_KEY/RESEND_API_KEY gibi diğer tüm sırlar da ENV
-# üzerinden geliyor (bkz. .env.example, config/deploy.yml), bu yüzden
-# Rails credentials yerine ENV kullanılıyor; Kamal'da tek yerden yönetilir.
-# Cloudflare R2 veya Backblaze B2 gibi S3 uyumlu bir servis kullanıyorsanız
-# AWS_ENDPOINT ekleyip bu bloğa `endpoint: <%= ENV["AWS_ENDPOINT"] %>` satırı
-# eklemeniz yeterli — gerisi aynı kalır.
-amazon:
+# üzerinden geliyor (bkz. .env.example), bu yüzden Rails credentials yerine
+# ENV kullanılıyor. "cloud" ismi bilinçli: Amazon'a bağımlı değiliz — Active
+# Storage'ın S3 adaptörü, S3 API'siyle uyumlu HERHANGİ bir servisle çalışır
+# (Cloudflare R2, Backblaze B2, gerçek AWS S3 vb.). Hangisini kullandığınız
+# sadece STORAGE_ENDPOINT'e girdiğiniz adrese bağlı — kod tarafında fark yok.
+cloud:
   service: S3
-  access_key_id: <%= ENV["AWS_ACCESS_KEY_ID"] %>
-  secret_access_key: <%= ENV["AWS_SECRET_ACCESS_KEY"] %>
-  region: <%= ENV.fetch("AWS_REGION", "eu-central-1") %>
-  bucket: <%= ENV["AWS_BUCKET"] %>
+  access_key_id: <%= ENV["STORAGE_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["STORAGE_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("STORAGE_REGION", "auto") %>
+  bucket: <%= ENV["STORAGE_BUCKET"] %>
+  # Gerçek AWS S3 kullanıyorsanız STORAGE_ENDPOINT'i boş bırakın (AWS'in
+  # kendi varsayılan adresini kullanır). Cloudflare R2/Backblaze B2 gibi S3
+  # uyumlu bir servis kullanıyorsanız o servisin verdiği endpoint adresini
+  # girin (R2 için: https://<account_id>.r2.cloudflarestorage.com).
+  <% if ENV["STORAGE_ENDPOINT"].present? %>
+  endpoint: <%= ENV["STORAGE_ENDPOINT"] %>
+  force_path_style: true
+  <% end %>
