@@ -6,23 +6,22 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-# Production — GEMINI_API_KEY/RESEND_API_KEY gibi diğer tüm sırlar da ENV
-# üzerinden geliyor (bkz. .env.example), bu yüzden Rails credentials yerine
-# ENV kullanılıyor. "cloud" ismi bilinçli: Amazon'a bağımlı değiliz — Active
-# Storage'ın S3 adaptörü, S3 API'siyle uyumlu HERHANGİ bir servisle çalışır
-# (Cloudflare R2, Backblaze B2, gerçek AWS S3 vb.). Hangisini kullandığınız
-# sadece STORAGE_ENDPOINT'e girdiğiniz adrese bağlı — kod tarafında fark yok.
+# Production — Cloudflare R2 (S3 API uyumlu, Amazon'a bağımlı değiliz).
+# GEMINI_API_KEY/RESEND_API_KEY gibi diğer tüm sırlar da ENV üzerinden
+# geliyor (bkz. .env.example), bu yüzden Rails credentials yerine ENV
+# kullanılıyor. Yarın başka bir S3 uyumlu servise (Backblaze B2, gerçek AWS
+# S3 vb.) geçilirse sadece bu üç env değişkeninin değerleri değişir, kod
+# aynı kalır.
 cloud:
   service: S3
-  access_key_id: <%= ENV["STORAGE_ACCESS_KEY_ID"] %>
-  secret_access_key: <%= ENV["STORAGE_SECRET_ACCESS_KEY"] %>
-  region: <%= ENV.fetch("STORAGE_REGION", "auto") %>
-  bucket: <%= ENV["STORAGE_BUCKET"] %>
-  # Gerçek AWS S3 kullanıyorsanız STORAGE_ENDPOINT'i boş bırakın (AWS'in
-  # kendi varsayılan adresini kullanır). Cloudflare R2/Backblaze B2 gibi S3
-  # uyumlu bir servis kullanıyorsanız o servisin verdiği endpoint adresini
-  # girin (R2 için: https://<account_id>.r2.cloudflarestorage.com).
-  <% if ENV["STORAGE_ENDPOINT"].present? %>
-  endpoint: <%= ENV["STORAGE_ENDPOINT"] %>
+  access_key_id: <%= ENV["R2_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["R2_SECRET_ACCESS_KEY"] %>
+  region: <%= ENV.fetch("R2_REGION", "auto") %>
+  bucket: <%= ENV["R2_BUCKET"] %>
+  # R2 (ve genel olarak S3 uyumlu servisler), gerçek AWS S3'ten farklı olarak
+  # kendi endpoint adresini ister. Gerçek AWS S3'e geçilirse R2_ENDPOINT boş
+  # bırakılabilir (AWS'in kendi varsayılan adresini kullanır).
+  <% if ENV["R2_ENDPOINT"].present? %>
+  endpoint: <%= ENV["R2_ENDPOINT"] %>
   force_path_style: true
   <% end %>

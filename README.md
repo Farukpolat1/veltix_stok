@@ -60,7 +60,7 @@ cp .env.example .env
 | `MAILER_FROM_ADDRESS` | E-postaların "kimden" adresi (Resend'de doğrulanmış olmalı) | Production'da evet |
 | `APP_HOST` | E-posta linklerinin işaret edeceği alan adı | Production'da evet |
 | `SENTRY_DSN` | Production'da yakalanmayan hataların (500) otomatik bildirimi | Opsiyonel |
-| `STORAGE_ACCESS_KEY_ID` / `STORAGE_SECRET_ACCESS_KEY` / `STORAGE_REGION` / `STORAGE_BUCKET` / `STORAGE_ENDPOINT` | Yüklenen PDF/görsellerin bulutta (S3, Cloudflare R2, Backblaze B2) saklanması — `STORAGE_ENDPOINT` sadece R2/B2 için gerekli | Production'da evet (yoksa container diski kullanılır, kalıcı değildir) |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` / `R2_REGION` / `R2_BUCKET` / `R2_ENDPOINT` | Yüklenen PDF/görsellerin Cloudflare R2'de saklanması | Production'da evet (yoksa container diski kullanılır, kalıcı değildir) |
 
 Boş bırakılan değişkenler yerelde/test'te sessizce devre dışı kalır
 (örn. Sentry hiç etkinleşmez, e-postalar `ActionMailer::Base.deliveries`
@@ -108,6 +108,5 @@ bin/kamal deploy  # sonraki deploy'lar
 ```
 
 Sırlar (`RAILS_MASTER_KEY`, `RESEND_API_KEY`, `GEMINI_API_KEY`,
-`SENTRY_DSN`, `STORAGE_ACCESS_KEY_ID`, `STORAGE_SECRET_ACCESS_KEY`)
-`.kamal/secrets` üzerinden enjekte edilir — gerçek değerleri asla repoya
-commit etmeyin.
+`SENTRY_DSN`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`) `.kamal/secrets`
+üzerinden enjekte edilir — gerçek değerleri asla repoya commit etmeyin.

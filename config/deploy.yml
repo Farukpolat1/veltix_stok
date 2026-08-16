@@ -43,19 +43,18 @@ env:
     - RESEND_API_KEY
     - GEMINI_API_KEY
     - SENTRY_DSN
-    - STORAGE_ACCESS_KEY_ID
-    - STORAGE_SECRET_ACCESS_KEY
+    - R2_ACCESS_KEY_ID
+    - R2_SECRET_ACCESS_KEY
   clear:
     # Gerçek alan adınız ve Resend'de doğrulanmış gönderen adresiniz — bkz.
     # .env.example. Deploy'dan önce burayı gerçek değerlerle güncelleyin.
     APP_HOST: example.com
     MAILER_FROM_ADDRESS: no-reply@example.com
 
-    # Bulut depolama bucket bilgisi (S3/R2/B2) — anahtarların aksine gizli
-    # değil, bu yüzden clear'da. Deploy'dan önce gerçek bucket/region'ı yazın.
-    # Cloudflare R2/Backblaze B2 kullanıyorsanız STORAGE_ENDPOINT'i de ekleyin.
-    STORAGE_REGION: auto
-    STORAGE_BUCKET: your_own_bucket
+    # Cloudflare R2 bucket bilgisi — anahtarların aksine gizli değil, bu
+    # yüzden clear'da. Deploy'dan önce gerçek bucket/endpoint'i yazın.
+    R2_REGION: auto
+    R2_BUCKET: your_own_bucket
 
     # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
     # When you start using multiple servers, you should split out job processing to a dedicated machine.
