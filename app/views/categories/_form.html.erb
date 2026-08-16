@@ -58,6 +58,12 @@
     <div class="form-text">Listede yok mu? <%= link_to "Yeni marka ekle", category_options_path, class: "link-primary" %>.</div>
   </div>
 
+  <div class="col-md-6">
+    <%= f.label :dashboard_group, "İş Özeti Grubu (opsiyonel)", class: "form-label" %>
+    <%= f.select :dashboard_group, Category::DASHBOARD_GROUP_LABELS.map { |value, label| [ label, value ] }, { include_blank: "Hiçbiri (İş Özeti kartlarına dahil edilmez)" }, class: "form-select" %>
+    <div class="form-text">Bu kategorideki satışlar/alışlar İş Özeti'nde hangi beyaz/renkli karta toplansın.</div>
+  </div>
+
   <% Category.custom_option_groups.each do |group| %>
     <div class="col-md-6">
       <%= f.label nil, group.name, class: "form-label" %>

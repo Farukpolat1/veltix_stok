@@ -22,6 +22,14 @@ class Product < ApplicationRecord
     UNIT_LABELS[unit]
   end
 
+  # İş Özeti'ndeki "Beyaz / Renkli" kartları için kaba kırılım — profil
+  # ürünlerinde color ada göre otomatik dolduruldu (bkz. backfill), aksesuar/
+  # camda elle girilir. color boşsa hiçbir karta girmez (nil).
+  def color_group
+    return nil if color.blank?
+    color.strip.casecmp?("beyaz") ? "Beyaz" : "Renkli"
+  end
+
   # Alış faturasında/kataloğunda ve müşteri siparişinde aynı ürün farklı
   # isimle geçebiliyor (ör. "Ege Lambri 200" alışta, "Kapı Lambrisi" satış
   # siparişinde) — Products::FindOrCreate ve arama bu alternatif isimlerden

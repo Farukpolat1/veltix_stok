@@ -121,7 +121,7 @@ class CategoriesController < ApplicationController
     end
 
     def category_params
-      params.expect(category: [ :name, :product_type, :code, :color, :accessory_type, :brand, :series, custom_attributes: {} ])
+      params.expect(category: [ :name, :product_type, :code, :color, :accessory_type, :brand, :series, :dashboard_group, custom_attributes: {} ])
     end
 
     def filtered_and_sorted(scope)

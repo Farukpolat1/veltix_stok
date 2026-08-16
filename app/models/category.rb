@@ -6,6 +6,40 @@ class Category < ApplicationRecord
 
   enum :product_type, { profil: 0, aksesuar: 1, diger: 2 }, default: :diger
 
+  # İş Özeti'ndeki "Beyaz/Renkli ..." kartlarının hangisine toplanacağı —
+  # kategori bazında admin ekrandan atanır (bkz. category form), kod içine
+  # gömülü bir kategori-adı listesi değil. nil = hiçbir karta dahil edilmez
+  # (genel toplamlarda yine görünür, sadece renk kırılımına girmez).
+  enum :dashboard_group, {
+    profil_mtul: 0,
+    pervaz: 1,
+    lambri: 2,
+    cam: 3,
+    kapi_aksesuari: 4,
+    aksesuar_cift_acilim: 5,
+    aksesuar_tek_acilim: 6
+  }, prefix: :dashboard_group
+
+  DASHBOARD_GROUP_LABELS = {
+    "profil_mtul" => "Mtül (Ana Profil)",
+    "pervaz" => "Pervaz",
+    "lambri" => "Lambri",
+    "cam" => "Cam",
+    "kapi_aksesuari" => "Kapı Aksesuarı",
+    "aksesuar_cift_acilim" => "Aksesuar (Çift Açılım)",
+    "aksesuar_tek_acilim" => "Aksesuar (Tek Açılım)"
+  }.freeze
+
+  DASHBOARD_GROUP_UNITS = {
+    "profil_mtul" => "mtül",
+    "pervaz" => "mtül",
+    "lambri" => "mtül",
+    "cam" => "m²",
+    "kapi_aksesuari" => "adet",
+    "aksesuar_cift_acilim" => "adet",
+    "aksesuar_tek_acilim" => "adet"
+  }.freeze
+
   PRODUCT_TYPE_LABELS = {
     "profil" => "Profil (PVC)",
     "aksesuar" => "Aksesuar (Donanım)",

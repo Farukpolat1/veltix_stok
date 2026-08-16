@@ -24,7 +24,7 @@ Rails.application.configure do
   # Yüklenen fatura PDF'leri/ürün görselleri container'ın kendi diskinde değil
   # S3'te (bkz. config/storage.yml, AWS_* env değişkenleri) tutulur — aksi
   # halde her deploy/restart'ta container'ın diskiyle birlikte kaybolabilirler.
-  config.active_storage.service = :amazon
+  config.active_storage.service = :local
 
   # Render, SSL'i kendi reverse proxy'sinde sonlandırıp uygulamaya düz HTTP
   # olarak iletiyor — bu ikisi açık olmadan hem oturum çerezleri güvensiz

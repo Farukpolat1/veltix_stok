@@ -88,6 +88,40 @@
   </div>
 </div>
 
+<p class="section-eyebrow mb-2"><i class="bi bi-palette"></i> Renk Kırılımı (Beyaz / Renkli)</p>
+<div class="card mb-4">
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-sm mb-0 align-middle">
+        <thead>
+          <tr>
+            <th>Grup</th>
+            <th class="text-end">Alınan Beyaz</th>
+            <th class="text-end">Alınan Renkli</th>
+            <th class="text-end">Satılan Beyaz</th>
+            <th class="text-end">Satılan Renkli</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% Category::DASHBOARD_GROUP_LABELS.each do |group, label| %>
+            <% unit = Category::DASHBOARD_GROUP_UNITS[group] %>
+            <tr>
+              <td><%= label %></td>
+              <td class="text-end"><%= number_with_delimiter(dashboard_group_amount(@period_purchase_color_breakdown, group, "Beyaz"), delimiter: ".", separator: ",") %> <span class="text-muted"><%= unit %></span></td>
+              <td class="text-end"><%= number_with_delimiter(dashboard_group_amount(@period_purchase_color_breakdown, group, "Renkli"), delimiter: ".", separator: ",") %> <span class="text-muted"><%= unit %></span></td>
+              <td class="text-end"><%= number_with_delimiter(dashboard_group_amount(@period_sale_color_breakdown, group, "Beyaz"), delimiter: ".", separator: ",") %> <span class="text-muted"><%= unit %></span></td>
+              <td class="text-end"><%= number_with_delimiter(dashboard_group_amount(@period_sale_color_breakdown, group, "Renkli"), delimiter: ".", separator: ",") %> <span class="text-muted"><%= unit %></span></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card-body pt-2">
+    <p class="form-text mb-0">Bir ürün renk kırılımına girmiyorsa (yukarıdaki tabloda 0 kalıyorsa) ilgili ürüne <%= link_to "Ürünler", products_path, class: "link-primary" %> ekranından renk, kategorisine de <%= link_to "Kategoriler", categories_path, class: "link-primary" %> ekranından İş Özeti Grubu atanmalı.</p>
+  </div>
+</div>
+
 <p class="section-eyebrow mb-2"><i class="bi bi-cash-coin"></i> Cari Hareketler · <span class="text-lowercase">detay için tıklayın</span></p>
 <div class="row g-3 mb-4">
   <div class="col-md-6">

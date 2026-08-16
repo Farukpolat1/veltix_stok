@@ -131,7 +131,7 @@ class ProductsController < ApplicationController
     end
 
     def product_params
-      params.expect(product: [ :code, :name, :category_id, :unit, :min_stock_level, :stock_quantity, :aliases_text ])
+      params.expect(product: [ :code, :name, :category_id, :unit, :min_stock_level, :stock_quantity, :aliases_text, :color ])
     end
 
     def filtered_and_sorted(scope)

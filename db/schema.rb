@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_10_103033) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_16_090000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -50,6 +50,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_103033) do
     t.bigint "company_id", null: false
     t.datetime "created_at", null: false
     t.jsonb "custom_attributes", default: {}, null: false
+    t.integer "dashboard_group"
     t.string "name"
     t.integer "product_type", default: 2, null: false
     t.string "series"
@@ -160,6 +161,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_103033) do
     t.string "aliases", default: [], null: false, array: true
     t.bigint "category_id", null: false
     t.string "code"
+    t.string "color"
     t.bigint "company_id", null: false
     t.datetime "created_at", null: false
     t.decimal "min_stock_level", default: "0.0"
@@ -169,6 +171,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_10_103033) do
     t.datetime "updated_at", null: false
     t.index ["aliases"], name: "index_products_on_aliases", using: :gin
     t.index ["category_id"], name: "index_products_on_category_id"
+    t.index ["color"], name: "index_products_on_color"
     t.index ["company_id", "code"], name: "index_products_on_company_id_and_code", unique: true
     t.index ["company_id"], name: "index_products_on_company_id"
   end

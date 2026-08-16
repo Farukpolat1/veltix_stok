@@ -78,6 +78,8 @@ class DashboardController < ApplicationController
       @period_sale_adet = stats[:sale_adet]
       @period_customer_payments_total = stats[:customer_payments]
       @period_supplier_payments_total = stats[:supplier_payments]
+      @period_purchase_color_breakdown = stats[:purchase_color_breakdown]
+      @period_sale_color_breakdown = stats[:sale_color_breakdown]
     end
 
     def load_workspace
@@ -125,9 +127,24 @@ class DashboardController < ApplicationController
       end
     end
 
+    # "products.color" boşsa NULL, "beyaz" ise 'Beyaz', aksi halde 'Renkli' —
+    # bkz. Product#color_group (aynı kural, burada SQL'e çevrilmiş hali;
+    # group/sum tek sorguda gitsin diye Ruby tarafında tekrar hesaplanmıyor).
+    COLOR_GROUP_SQL = "CASE WHEN products.color IS NULL THEN NULL WHEN lower(products.color) = 'beyaz' THEN 'Beyaz' ELSE 'Renkli' END"
+
+    # Kategorinin dashboard_group'una göre (Mtül/Pervaz/Lambri/Cam/Kapı
+    # Aksesuarı/Çift Açılım/Tek Açılım) ve rengine göre (Beyaz/Renkli) miktar
+    # toplamı — İş Özeti'ndeki renk kırılımı kartları için.
+    def color_breakdown_for(scope, quantity_column:)
+      scope.where.not(categories: { dashboard_group: nil })
+           .group("categories.dashboard_group")
+           .group(Arel.sql(COLOR_GROUP_SQL))
+           .sum(quantity_column)
+    end
+
     def compute_period_stats(range)
-      approved_purchase_lines = PurchaseInvoiceLine.joins(:purchase_invoice, :product).where(purchase_invoices: { status: :approved, updated_at: range })
-      approved_sale_lines = SaleLine.joins(:sale, :product).where(sales: { status: :approved, updated_at: range })
+      approved_purchase_lines = PurchaseInvoiceLine.joins(:purchase_invoice, product: :category).where(purchase_invoices: { status: :approved, updated_at: range })
+      approved_sale_lines = SaleLine.joins(:sale, product: :category).where(sales: { status: :approved, updated_at: range })
 
       {
         stock_in: StockMovement.where(occurred_at: range, direction: :in).sum(:quantity),
@@ -142,6 +159,8 @@ class DashboardController < ApplicationController
         sale_total: approved_sale_lines.sum("sale_lines.quantity * sale_lines.unit_price * (1 + sale_lines.vat_rate / 100)"),
         sale_mtul: approved_sale_lines.where(products: { unit: :mtul }).sum("sale_lines.quantity"),
         sale_adet: approved_sale_lines.where(products: { unit: :adet }).sum("sale_lines.quantity"),
+        purchase_color_breakdown: color_breakdown_for(approved_purchase_lines, quantity_column: "purchase_invoice_lines.quantity"),
+        sale_color_breakdown: color_breakdown_for(approved_sale_lines, quantity_column: "sale_lines.quantity"),
         customer_payments: CustomerPayment.where(paid_at: range).sum(:amount),
         supplier_payments: SupplierPayment.where(paid_at: range).sum(:amount),
         pending_purchase_invoices: PurchaseInvoice.pending.count,

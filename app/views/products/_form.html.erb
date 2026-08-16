@@ -39,6 +39,12 @@
     <%= f.number_field :min_stock_level, step: "any", class: "form-control" %>
   </div>
 
+  <div class="col-md-4">
+    <%= f.label :color, "Renk (opsiyonel)", class: "form-label" %>
+    <%= f.select :color, Category.color_options, { include_blank: "Belirtilmedi" }, class: "form-select" %>
+    <div class="form-text">İş Özeti'ndeki Beyaz/Renkli kartları için — "Beyaz" dışındaki her renk "Renkli" sayılır.</div>
+  </div>
+
   <div class="col-12">
     <%= f.label :aliases_text, "Alternatif İsimler (opsiyonel)", class: "form-label" %>
     <%= f.text_field :aliases_text, class: "form-control", placeholder: "Virgülle ayırın, ör: Kapı Lambrisi, Lambri 200" %>

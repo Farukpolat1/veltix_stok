@@ -39,6 +39,13 @@ module ApplicationHelper
   # arama/filtre parametrelerini korur, tekrar tıklayınca yönü (asc/desc)
   # değiştirir. `column`, çağıran controller'ın izin verdiği (whitelist)
   # bir sıralama anahtarı olmalı.
+  # İş Özeti'ndeki renk kırılımı kartları — DashboardController#color_breakdown_for
+  # ["profil_mtul", "Beyaz"] gibi çift anahtarlı bir hash döndürüyor, burada tek
+  # bir grup+renk için miktarı okur (yoksa 0).
+  def dashboard_group_amount(breakdown, group, color)
+    breakdown&.fetch([ group.to_s, color ], nil) || 0
+  end
+
   def sortable_header(column, label)
     column = column.to_s
     current_sort = params[:sort]
