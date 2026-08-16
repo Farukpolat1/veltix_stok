@@ -3,6 +3,10 @@
 # If running the rails server then create or migrate existing database
 if [ "${@: -2:1}" == "./bin/rails" ] && [ "${@: -1:1}" == "server" ]; then
   ./bin/rails db:prepare
+  # primary/cache/queue/cable tek bir paylaşılan Postgres'i kullandığında
+  # (bkz. config/database.yml) db:prepare, cache/queue/cable tablolarını
+  # sessizce atlıyor — bkz. lib/tasks/ensure_shared_databases.rake.
+  ./bin/rails db:ensure_shared_databases_prepared
 fi
 
 exec "${@}"

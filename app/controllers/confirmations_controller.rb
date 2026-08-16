@@ -1,7 +1,10 @@
 class ConfirmationsController < ApplicationController
   layout "guest", only: :new
   allow_unauthenticated_access
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_confirmation_path, alert: "Çok fazla deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin." }
+  # store: bkz. sessions_controller.rb'deki aynı satırın yorumu — Solid
+  # Cache'e bağımlı olmasın diye süreç-içi bellek kullanıyoruz.
+  rate_limit to: 10, within: 3.minutes, only: :create, store: ActiveSupport::Cache::MemoryStore.new,
+    with: -> { redirect_to new_confirmation_path, alert: "Çok fazla deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin." }
 
   def new
   end

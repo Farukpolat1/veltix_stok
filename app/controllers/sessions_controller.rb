@@ -1,7 +1,12 @@
 class SessionsController < ApplicationController
   layout "guest", only: :new
   allow_unauthenticated_access only: %i[ new create ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_session_path, alert: "Çok fazla deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin." }
+  # store: bilinçli olarak süreç-içi bellek (varsayılan Rails.cache/Solid
+  # Cache DEĞİL) — giriş, hiçbir şart altında Solid Cache tablosunun
+  # varlığına/erişilebilirliğine bağımlı olmamalı; o tablo bir sorun
+  # yaşarsa (ör. henüz migrate edilmemiş) kimse giriş yapamaz hale gelirdi.
+  rate_limit to: 10, within: 3.minutes, only: :create, store: ActiveSupport::Cache::MemoryStore.new,
+    with: -> { redirect_to new_session_path, alert: "Çok fazla deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin." }
 
   def new
   end

@@ -2,7 +2,10 @@ class PasswordsController < ApplicationController
   layout "guest", only: %i[ new edit ]
   allow_unauthenticated_access
   before_action :set_user_by_token, only: %i[ edit update ]
-  rate_limit to: 10, within: 3.minutes, only: :create, with: -> { redirect_to new_password_path, alert: "Çok fazla deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin." }
+  # store: bkz. sessions_controller.rb'deki aynı satırın yorumu — Solid
+  # Cache'e bağımlı olmasın diye süreç-içi bellek kullanıyoruz.
+  rate_limit to: 10, within: 3.minutes, only: :create, store: ActiveSupport::Cache::MemoryStore.new,
+    with: -> { redirect_to new_password_path, alert: "Çok fazla deneme yapıldı. Lütfen birkaç dakika sonra tekrar deneyin." }
 
   def new
   end
